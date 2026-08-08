@@ -17,32 +17,32 @@ function FileSlot({ label, sublabel, file, preview, esPDF, error, onFile, onRemo
   return (
     <div>
       <p className="text-sm font-semibold text-gray-800 mb-0.5">{label}</p>
-      {sublabel && <p className="text-xs text-gray-500 mb-2">{sublabel}</p>}
+      {sublabel && <p className="text-sm text-gray-500 mb-2">{sublabel}</p>}
       {file ? (
         <div className="border-2 border-blue-200 bg-blue-50 rounded-xl p-3 flex items-center gap-3">
           {preview
             ? <img src={preview} alt="vista previa" className="w-14 h-14 object-cover rounded-lg flex-shrink-0 border border-gray-200" />
             : <div className="w-14 h-14 bg-white rounded-lg flex flex-col items-center justify-center flex-shrink-0 border border-gray-200">
-                <span className="text-[10px] font-bold text-gray-500">{esPDF ? 'PDF' : 'XML'}</span>
+                <span className="text-xs font-bold text-gray-500">{esPDF ? 'PDF' : 'XML'}</span>
               </div>
           }
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-800 truncate">{file.name}</p>
-            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(0)} KB · Listo para enviar</p>
+            <p className="text-sm text-gray-500">{(file.size / 1024).toFixed(0)} KB · Listo para enviar</p>
           </div>
-          <button type="button" onClick={onRemove} className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 active:bg-red-100 border border-gray-200 flex-shrink-0 transition-colors">
+          <button type="button" onClick={onRemove} className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-red-500 hover:bg-red-50 active:bg-red-100 border border-gray-200 flex-shrink-0 transition-colors">
             <X size={16} />
           </button>
         </div>
       ) : (
         <label className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-5 cursor-pointer active:bg-gray-50 transition-colors ${error ? 'border-red-400 bg-red-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'}`}>
-          <Upload size={22} className={`mb-2 ${error ? 'text-red-400' : 'text-gray-400'}`} />
+          <Upload size={22} className={`mb-2 ${error ? 'text-red-400' : 'text-gray-600'}`} />
           <p className="text-sm font-medium text-gray-700 text-center">Toca para subir</p>
-          <p className="text-xs text-gray-400 mt-0.5">{accept.replace(/\./g, '').replace(/,/g, ', ').toUpperCase()}</p>
+          <p className="text-sm text-gray-600 mt-0.5">{accept.replace(/\./g, '').replace(/,/g, ', ').toUpperCase()}</p>
           <input type="file" accept={accept} className="hidden" onChange={onFile} />
         </label>
       )}
-      {error && <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{error}</p>}
+      {error && <p className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{error}</p>}
     </div>
   )
 }
@@ -164,7 +164,7 @@ export default function NuevoGasto() {
             <option value="">Selecciona tu viaje</option>
             {viajesActivos.map(v => <option key={v.id} value={v.id}>{v.nombre}</option>)}
           </select>
-          {errors.viaje_id && <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{errors.viaje_id}</p>}
+          {errors.viaje_id && <p className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{errors.viaje_id}</p>}
         </div>
 
         {/* Monto + Moneda */}
@@ -176,9 +176,9 @@ export default function NuevoGasto() {
               {monedas.map(m => <option key={m.val} value={m.val}>{m.val}</option>)}
             </select>
             <input type="number" placeholder="0.00" value={form.monto} onChange={e => set('monto', e.target.value)}
-              className={`flex-1 border-2 rounded-xl px-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500 ${errors.monto ? 'border-red-400' : 'border-gray-200'}`} />
+              className={`flex-1 min-w-0 border-2 rounded-xl px-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500 ${errors.monto ? 'border-red-400' : 'border-gray-200'}`} />
           </div>
-          {errors.monto && <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{errors.monto}</p>}
+          {errors.monto && <p className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{errors.monto}</p>}
         </div>
 
         {/* Categoría + Fecha */}
@@ -190,13 +190,13 @@ export default function NuevoGasto() {
               <option value="">Selecciona una categoría</option>
               {categorias.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            {errors.categoria && <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{errors.categoria}</p>}
+            {errors.categoria && <p className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{errors.categoria}</p>}
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-2">Fecha del gasto <span className="text-red-500">*</span></label>
             <input type="date" value={form.fecha} onChange={e => set('fecha', e.target.value)}
               className={`w-full border-2 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 ${errors.fecha ? 'border-red-400' : 'border-gray-200'}`} />
-            {errors.fecha && <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{errors.fecha}</p>}
+            {errors.fecha && <p className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle size={12} />{errors.fecha}</p>}
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-2">Descripción</label>
@@ -204,7 +204,7 @@ export default function NuevoGasto() {
               rows={2} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 resize-none" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-800 mb-2">Ubicación <span className="text-gray-400 font-normal">(opcional)</span></label>
+            <label className="block text-sm font-semibold text-gray-800 mb-2">Ubicación <span className="text-gray-600 font-normal">(opcional)</span></label>
             <div className="flex gap-2">
               <input type="text" placeholder="Ciudad o dirección" value={form.ubicacion} onChange={e => set('ubicacion', e.target.value)}
                 className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" />
@@ -221,7 +221,7 @@ export default function NuevoGasto() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-4">
           <div>
             <p className="text-sm font-bold text-gray-900">Documentos <span className="text-red-500">*</span></p>
-            <p className="text-xs text-gray-500 mt-0.5">Sube al menos el recibo o la factura</p>
+            <p className="text-sm text-gray-500 mt-0.5">Sube al menos el recibo o la factura</p>
           </div>
           <FileSlot label="Recibo / Ticket" sublabel="Foto o PDF del comprobante de pago"
             file={form.recibo} preview={form.reciboPreview} esPDF={form.recibo?.type === 'application/pdf'}

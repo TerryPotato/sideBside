@@ -54,8 +54,8 @@ export default function Notificaciones() {
         </div>
         <div className="flex-1 min-w-0">
           <p className={`text-sm leading-snug ${!n.leido ? 'font-bold text-gray-900' : 'font-medium text-gray-600'}`}>{n.titulo}</p>
-          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{n.detalle}</p>
-          <p className="text-[11px] text-gray-400 mt-1.5 font-medium">{n.hora}</p>
+          <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">{n.detalle}</p>
+          <p className="text-xs text-gray-600 mt-1.5 font-medium">{n.hora}</p>
         </div>
         {!n.leido && <span className="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0 mt-1.5" />}
       </div>
@@ -68,10 +68,10 @@ export default function Notificaciones() {
       <div className="sticky top-0 bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
         <div className="flex items-center gap-2">
           <h1 className="text-lg font-bold text-gray-900">Notificaciones</h1>
-          {noLeidas > 0 && <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">{noLeidas}</span>}
+          {noLeidas > 0 && <span className="bg-blue-500 text-white text-sm font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">{noLeidas}</span>}
         </div>
         {noLeidas > 0 && (
-          <button onClick={marcarTodas} className="text-xs font-semibold text-blue-600 hover:text-blue-700 active:text-blue-800 py-1.5 px-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+          <button onClick={marcarTodas} className="text-sm font-semibold text-blue-600 hover:text-blue-700 active:text-blue-800 py-1.5 px-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
             Marcar todas
           </button>
         )}
@@ -81,7 +81,7 @@ export default function Notificaciones() {
         {/* Hoy */}
         {hoy.length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Hoy</p>
+            <p className="text-sm font-bold text-gray-600 uppercase tracking-widest px-1">Hoy</p>
             {hoy.map((n, i) => <Item key={i} n={n} i={i} />)}
           </div>
         )}
@@ -89,13 +89,13 @@ export default function Notificaciones() {
         {/* Anteriores */}
         {anteriores.length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Anteriores</p>
+            <p className="text-sm font-bold text-gray-600 uppercase tracking-widest px-1">Anteriores</p>
             {anteriores.map((n, i) => <Item key={i + hoy.length} n={n} i={i + hoy.length} />)}
           </div>
         )}
 
         {notis.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-20 text-gray-600">
             <Bell size={40} className="mb-3 opacity-30" />
             <p className="text-sm">Sin notificaciones</p>
           </div>

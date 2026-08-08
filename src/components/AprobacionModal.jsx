@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { X, ChevronLeft, ChevronRight, Check, XCircle, ImageOff, MapPin, Calendar, Tag, DollarSign } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useData } from '../context/DataContext'
+import IconButton from './IconButton'
+import { formatDate } from '../utils/date'
 
 export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
-  const { gastosDeViaje, aprobarGasto, rechazarGasto } = useData()
+  const { gastosDeViaje, aprobarGasto, rechazarGasto, revertirGasto } = useData()
   const pendientes = gastosDeViaje(viaje.id).filter(g => g.estado === 'Pendiente')
 
   const [idx, setIdx] = useState(Math.min(initialIdx, Math.max(0, pendientes.length - 1)))
@@ -27,9 +29,23 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
     )
   }
 
+  function undoToast(id, mensaje) {
+    toast((t) => (
+      <div className="flex items-center gap-3">
+        <span>{mensaje}</span>
+        <button
+          onClick={() => { revertirGasto(id); toast.dismiss(t.id) }}
+          className="text-sm font-bold text-blue-600 hover:underline flex-shrink-0"
+        >
+          Deshacer
+        </button>
+      </div>
+    ), { duration: 5000 })
+  }
+
   function handleAprobar() {
     aprobarGasto(gasto.id)
-    toast.success(`Gasto de $${gasto.monto} aprobado`)
+    undoToast(gasto.id, `Gasto de $${gasto.monto} aprobado`)
     setComentario('')
     setRechazando(false)
     if (idx >= total - 1) onClose()
@@ -42,7 +58,7 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
       return
     }
     rechazarGasto(gasto.id, comentario)
-    toast.error(`Gasto rechazado`)
+    undoToast(gasto.id, 'Gasto rechazado')
     setComentario('')
     setRechazando(false)
     if (idx >= total - 1) onClose()
@@ -59,15 +75,13 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
         <div className="flex items-center justify-between px-5 py-3 border-b bg-[#1a2456]">
           <div className="flex items-center gap-3 min-w-0">
             <h2 className="text-white font-semibold text-sm truncate">{viaje.nombre}</h2>
-            <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+            <span className="bg-yellow-400 text-yellow-900 text-sm font-bold px-2 py-0.5 rounded-full flex-shrink-0">
               {total} pendiente{total !== 1 ? 's' : ''}
             </span>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className="text-blue-200 text-xs">{idx + 1} / {total}</span>
-            <button onClick={onClose} className="text-blue-200 hover:text-white">
-              <X size={20} />
-            </button>
+            <span className="text-blue-200 text-sm">{idx + 1} / {total}</span>
+            <IconButton icon={X} label="Cerrar" onClick={onClose} variant="ghostOnDark" size="sm" iconSize={20} />
           </div>
         </div>
 
@@ -88,20 +102,16 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
             {/* Navegación */}
             {total > 1 && (
               <div className="absolute bottom-3 flex gap-2">
-                <button
+                <IconButton
+                  icon={ChevronLeft} label="Recibo anterior" variant="onImage"
                   onClick={() => { setIdx(i => i - 1); setRechazando(false); setComentario('') }}
                   disabled={idx === 0}
-                  className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center disabled:opacity-30"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
+                />
+                <IconButton
+                  icon={ChevronRight} label="Siguiente recibo" variant="onImage"
                   onClick={() => { setIdx(i => i + 1); setRechazando(false); setComentario('') }}
                   disabled={idx === total - 1}
-                  className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center disabled:opacity-30"
-                >
-                  <ChevronRight size={16} />
-                </button>
+                />
               </div>
             )}
           </div>
@@ -110,29 +120,29 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
           <div className="sm:w-1/2 flex flex-col overflow-y-auto">
             <div className="flex-1 p-5 space-y-4">
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wide mb-3">Datos del gasto</p>
+                <p className="text-sm text-gray-600 uppercase tracking-wide mb-3">Datos del gasto</p>
                 <DataRow icon={<DollarSign size={14} />} label="Monto" value={<span className="text-lg font-bold text-gray-900">${gasto.monto.toFixed(2)}</span>} />
                 <DataRow icon={<Tag size={14} />} label="Categoría" value={gasto.categoria} />
-                <DataRow icon={<Calendar size={14} />} label="Fecha" value={gasto.fecha} />
+                <DataRow icon={<Calendar size={14} />} label="Fecha" value={formatDate(gasto.fecha)} />
                 {gasto.ubicacion && <DataRow icon={<MapPin size={14} />} label="Ubicación" value={gasto.ubicacion} />}
               </div>
 
               {gasto.descripcion && (
                 <div>
-                  <p className="text-xs text-gray-400 mb-1">Descripción</p>
+                  <p className="text-sm text-gray-600 mb-1">Descripción</p>
                   <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{gasto.descripcion}</p>
                 </div>
               )}
 
               <div>
-                <p className="text-xs text-gray-400 mb-1">Empleado</p>
+                <p className="text-sm text-gray-600 mb-1">Empleado</p>
                 <p className="text-sm font-medium text-gray-800">{gasto.empleado}</p>
               </div>
 
               {/* Comentario rechazo */}
               {rechazando && (
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Motivo del rechazo <span className="text-red-500">*</span></label>
+                  <label className="text-sm text-gray-500 mb-1 block">Motivo del rechazo <span className="text-red-500">*</span></label>
                   <textarea
                     autoFocus
                     value={comentario}
@@ -189,8 +199,8 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
 function DataRow({ icon, label, value }) {
   return (
     <div className="flex items-start gap-2 py-1.5 border-b border-gray-100 last:border-0">
-      <span className="text-gray-400 mt-0.5 flex-shrink-0">{icon}</span>
-      <span className="text-xs text-gray-400 w-20 flex-shrink-0 mt-0.5">{label}</span>
+      <span className="text-gray-600 mt-0.5 flex-shrink-0">{icon}</span>
+      <span className="text-sm text-gray-600 w-20 flex-shrink-0 mt-0.5">{label}</span>
       <span className="text-sm text-gray-800">{value}</span>
     </div>
   )

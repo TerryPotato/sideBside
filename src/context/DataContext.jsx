@@ -59,6 +59,10 @@ export function DataProvider({ children }) {
     setGastos(prev => prev.map(g => g.id === id ? { ...g, estado: 'Rechazado', comentario } : g))
   }
 
+  function revertirGasto(id) {
+    setGastos(prev => prev.map(g => g.id === id ? { ...g, estado: 'Pendiente', comentario: undefined } : g))
+  }
+
   function gastosDeViaje(viaje_id) {
     return gastos.filter(g => g.viaje_id === viaje_id)
   }
@@ -94,7 +98,7 @@ export function DataProvider({ children }) {
   return (
     <DataContext.Provider value={{
       viajes, gastos, categorias, usuariosList, borradores,
-      crearViaje, agregarGasto, aprobarGasto, rechazarGasto,
+      crearViaje, agregarGasto, aprobarGasto, rechazarGasto, revertirGasto,
       gastosDeViaje, viajesActivosDeUsuario,
       saveDraft, eliminarBorrador,
       actualizarCategoria, crearCategoria,

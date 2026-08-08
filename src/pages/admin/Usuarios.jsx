@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, Trash2, X } from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import toast from 'react-hot-toast'
+import IconButton from '../../components/IconButton'
 
 const rolBadge = {
   admin: 'bg-blue-100 text-blue-700',
@@ -94,7 +95,7 @@ export default function Usuarios() {
         <div className="bg-white rounded-2xl border border-blue-100 shadow-sm p-5 mb-5">
           <div className="flex items-center justify-between mb-4">
             <p className="font-bold text-gray-900">Nuevo usuario</p>
-            <button onClick={() => { setShowForm(false); setErrors({}) }} className="text-gray-400 hover:text-gray-600 p-1"><X size={18} /></button>
+            <button onClick={() => { setShowForm(false); setErrors({}) }} className="text-gray-600 hover:text-gray-600 p-1"><X size={18} /></button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -104,14 +105,14 @@ export default function Usuarios() {
                 { f: 'num_empleado', label: 'Número de empleado' },
               ].map(({ f, label }) => (
                 <div key={f} className={f === 'nombre' ? 'sm:col-span-2' : ''}>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">{label} <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">{label} <span className="text-red-500">*</span></label>
                   <input value={form[f]} onChange={e => set(f, e.target.value)}
                     className={`w-full border-2 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 ${errors[f] ? 'border-red-400' : 'border-gray-200'}`} />
-                  {errors[f] && <p className="text-xs text-red-500 mt-1">{errors[f]}</p>}
+                  {errors[f] && <p className="text-sm text-red-500 mt-1">{errors[f]}</p>}
                 </div>
               ))}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Rol</label>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Rol</label>
                 <select value={form.rol} onChange={e => set('rol', e.target.value)}
                   className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 bg-white">
                   <option value="operador">Operador</option>
@@ -134,11 +135,11 @@ export default function Usuarios() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left bg-gray-50 border-b border-gray-100">
-                <th className="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Empleado</th>
-                <th className="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">No. Empleado</th>
-                <th className="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Correo</th>
-                <th className="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Rol</th>
-                <th className="px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Acciones</th>
+                <th className="px-5 py-3 text-sm font-bold text-gray-500 uppercase tracking-wide">Empleado</th>
+                <th className="px-5 py-3 text-sm font-bold text-gray-500 uppercase tracking-wide">No. Empleado</th>
+                <th className="px-5 py-3 text-sm font-bold text-gray-500 uppercase tracking-wide">Correo</th>
+                <th className="px-5 py-3 text-sm font-bold text-gray-500 uppercase tracking-wide">Rol</th>
+                <th className="px-5 py-3 text-sm font-bold text-gray-500 uppercase tracking-wide">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -148,12 +149,10 @@ export default function Usuarios() {
                   <td className="px-5 py-3.5 font-mono text-sm text-gray-600">{u.num_empleado || '—'}</td>
                   <td className="px-5 py-3.5 text-gray-600">{u.email}</td>
                   <td className="px-5 py-3.5">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${rolBadge[u.rol] ?? 'bg-gray-100 text-gray-600'}`}>{u.rol ?? 'operador'}</span>
+                    <span className={`px-2.5 py-1 rounded-full text-sm font-bold ${rolBadge[u.rol] ?? 'bg-gray-100 text-gray-600'}`}>{u.rol ?? 'operador'}</span>
                   </td>
                   <td className="px-5 py-3.5">
-                    <button onClick={() => setDeleteTarget(u)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-500 border border-red-100 transition-colors">
-                      <Trash2 size={15} />
-                    </button>
+                    <IconButton icon={Trash2} label={`Eliminar a ${u.nombre}`} onClick={() => setDeleteTarget(u)} variant="danger" rounded="rounded-lg" iconSize={15} />
                   </td>
                 </tr>
               ))}
@@ -170,8 +169,8 @@ export default function Usuarios() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900 text-sm">{u.nombre}</p>
-                <p className="text-xs text-gray-500">{u.num_empleado || '—'} · {u.email}</p>
-                <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-bold ${rolBadge[u.rol] ?? 'bg-gray-100 text-gray-600'}`}>{u.rol ?? 'operador'}</span>
+                <p className="text-sm text-gray-500">{u.num_empleado || '—'} · {u.email}</p>
+                <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-sm font-bold ${rolBadge[u.rol] ?? 'bg-gray-100 text-gray-600'}`}>{u.rol ?? 'operador'}</span>
               </div>
               <button onClick={() => setDeleteTarget(u)} className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 flex-shrink-0">
                 <Trash2 size={16} />

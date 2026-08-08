@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react'
-import { Eye, Download, ChevronLeft, ChevronRight, X, MapPin, Calendar, Tag, DollarSign, ImageOff, ClipboardCheck } from 'lucide-react'
+import { Eye, FileSpreadsheet, FileText, ChevronLeft, ChevronRight, X, MapPin, Calendar, Tag, DollarSign, ImageOff, ClipboardCheck } from 'lucide-react'
 import EmptyState from '../../components/EmptyState'
 import AprobacionModal from '../../components/AprobacionModal'
+import IconButton from '../../components/IconButton'
 import toast from 'react-hot-toast'
 import { useData } from '../../context/DataContext'
+import { formatDate } from '../../utils/date'
 
 const estadoBadge = {
   Aprobado: 'text-green-700 bg-green-100',
@@ -32,7 +34,7 @@ function DetalleModal({ gasto, viaje, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b">
           <h2 className="text-base font-semibold text-gray-800">Detalle del gasto</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+          <IconButton icon={X} label="Cerrar" onClick={onClose} size="sm" iconSize={20} />
         </div>
 
         {/* Comprobante */}
@@ -42,7 +44,7 @@ function DetalleModal({ gasto, viaje, onClose }) {
           ) : (
             <div className="flex flex-col items-center gap-2 text-gray-500">
               <ImageOff size={32} className="opacity-40" />
-              <p className="text-xs opacity-50">Sin comprobante</p>
+              <p className="text-sm opacity-50">Sin comprobante</p>
             </div>
           )}
         </div>
@@ -51,33 +53,33 @@ function DetalleModal({ gasto, viaje, onClose }) {
         <div className="p-5 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-gray-900">${gasto.monto?.toFixed(2)}</span>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${estadoBadge[gasto.estado]}`}>{gasto.estado}</span>
+            <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[gasto.estado]}`}>{gasto.estado}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3 text-sm">
             <Row icon={<Tag size={13} />} label="Categoría" value={gasto.categoria} />
-            <Row icon={<Calendar size={13} />} label="Fecha" value={gasto.fecha} />
+            <Row icon={<Calendar size={13} />} label="Fecha" value={formatDate(gasto.fecha)} />
             <Row icon={<DollarSign size={13} />} label="Empleado" value={gasto.empleado} />
             {gasto.ubicacion && <Row icon={<MapPin size={13} />} label="Ubicación" value={gasto.ubicacion} />}
           </div>
 
           {gasto.descripcion && (
             <div>
-              <p className="text-xs text-gray-400 mb-1">Descripción</p>
+              <p className="text-sm text-gray-600 mb-1">Descripción</p>
               <p className="text-sm text-gray-700 bg-gray-50 rounded-lg px-3 py-2">{gasto.descripcion}</p>
             </div>
           )}
 
           {viaje && (
             <div>
-              <p className="text-xs text-gray-400 mb-1">Viaje</p>
+              <p className="text-sm text-gray-600 mb-1">Viaje</p>
               <p className="text-sm text-gray-700">{viaje.nombre}</p>
             </div>
           )}
 
           {gasto.comentario && (
             <div>
-              <p className="text-xs text-gray-400 mb-1">Motivo de rechazo</p>
+              <p className="text-sm text-gray-600 mb-1">Motivo de rechazo</p>
               <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{gasto.comentario}</p>
             </div>
           )}
@@ -90,9 +92,9 @@ function DetalleModal({ gasto, viaje, onClose }) {
 function Row({ icon, label, value }) {
   return (
     <div>
-      <div className="flex items-center gap-1 text-gray-400 mb-0.5">
+      <div className="flex items-center gap-1 text-gray-600 mb-0.5">
         {icon}
-        <span className="text-xs">{label}</span>
+        <span className="text-sm">{label}</span>
       </div>
       <p className="text-sm text-gray-700 font-medium">{value}</p>
     </div>
@@ -157,11 +159,11 @@ export default function TodosGastos() {
       <div className="flex items-center justify-between mb-6 gap-2">
         <h1 className="text-xl font-bold text-gray-800">Todos los Gastos</h1>
         <div className="flex gap-2">
-          <button onClick={() => toast.success('Descargando Excel...')} className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
-            <Download size={14} /><span className="hidden sm:inline">Excel</span>
+          <button onClick={() => toast.success('Descargando Excel...')} aria-label="Descargar Excel" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
+            <FileSpreadsheet size={14} /><span className="hidden sm:inline">Excel</span>
           </button>
-          <button onClick={() => toast.success('Descargando PDF...')} className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
-            <Download size={14} /><span className="hidden sm:inline">PDF</span>
+          <button onClick={() => toast.success('Descargando PDF...')} aria-label="Descargar PDF" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
+            <FileText size={14} /><span className="hidden sm:inline">PDF</span>
           </button>
         </div>
       </div>
@@ -170,22 +172,22 @@ export default function TodosGastos() {
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
         <div className="flex flex-wrap gap-3">
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500">Fecha desde</label>
+            <label className="text-sm text-gray-500">Fecha desde</label>
             <input type="date" value={desde} onChange={e => { setDesde(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500">Fecha hasta</label>
+            <label className="text-sm text-gray-500">Fecha hasta</label>
             <input type="date" value={hasta} onChange={e => { setHasta(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500">Categoría</label>
+            <label className="text-sm text-gray-500">Categoría</label>
             <select value={categoria} onChange={e => { setCategoria(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
               <option>Todas</option>
               {['Comida','Combustible','Peaje','Mantenimiento','Hospedaje','Transporte','Otros'].map(c => <option key={c}>{c}</option>)}
             </select>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500">Estado</label>
+            <label className="text-sm text-gray-500">Estado</label>
             <select value={estado} onChange={e => { setEstado(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
               <option>Todos</option>
               <option>Aprobado</option>
@@ -205,42 +207,36 @@ export default function TodosGastos() {
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-gray-400 border-b">
-                    <th className="pb-2 font-medium">Empleado</th>
-                    <th className="pb-2 font-medium">Viaje</th>
-                    <th className="pb-2 font-medium">Categoría</th>
-                    <th className="pb-2 font-medium">Descripción</th>
-                    <th className="pb-2 font-medium">Fecha</th>
-                    <th className="pb-2 font-medium">Monto</th>
-                    <th className="pb-2 font-medium">Estado</th>
+                  <tr className="text-left text-sm text-gray-600 border-b">
+                    <th className="pb-2 pr-4 font-medium">Empleado</th>
+                    <th className="pb-2 pr-4 font-medium">Viaje</th>
+                    <th className="pb-2 pr-4 font-medium">Categoría</th>
+                    <th className="pb-2 pr-4 font-medium">Descripción</th>
+                    <th className="pb-2 pr-4 font-medium">Fecha</th>
+                    <th className="pb-2 pr-4 font-medium">Monto</th>
+                    <th className="pb-2 pr-4 font-medium">Estado</th>
                     <th className="pb-2 font-medium">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pagActual.map((g) => (
                     <tr key={g.id} className={`border-b last:border-0 transition-colors ${estadoFila[g.estado]}`}>
-                      <td className="py-2.5 text-gray-700 whitespace-nowrap">{g.empleado}</td>
-                      <td className="py-2.5 text-gray-500 max-w-[140px] truncate">{nombreViaje(g.viaje_id)}</td>
-                      <td className="py-2.5 text-gray-500">{g.categoria}</td>
-                      <td className="py-2.5 text-gray-700">{g.descripcion}</td>
-                      <td className="py-2.5 text-gray-500 whitespace-nowrap">{g.fecha}</td>
-                      <td className="py-2.5 font-medium text-gray-800 whitespace-nowrap">${g.monto.toFixed(2)}</td>
-                      <td className="py-2.5">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                      <td className="py-2.5 pr-4 text-gray-700 whitespace-nowrap">{g.empleado}</td>
+                      <td className="py-2.5 pr-4 text-gray-500 max-w-[140px] truncate">{nombreViaje(g.viaje_id)}</td>
+                      <td className="py-2.5 pr-4 text-gray-500">{g.categoria}</td>
+                      <td className="py-2.5 pr-4 text-gray-700">{g.descripcion}</td>
+                      <td className="py-2.5 pr-4 text-gray-500 whitespace-nowrap">{formatDate(g.fecha)}</td>
+                      <td className="py-2.5 pr-4 font-medium text-gray-800 whitespace-nowrap">${g.monto.toFixed(2)}</td>
+                      <td className="py-2.5 pr-4">
+                        <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
                       </td>
                       <td className="py-2.5">
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setGastoDetalle(g)}
-                            className="w-7 h-7 bg-green-100 hover:bg-green-200 text-green-600 rounded flex items-center justify-center transition-colors"
-                            title="Ver detalle"
-                          >
-                            <Eye size={14} />
-                          </button>
+                          <IconButton icon={Eye} label="Ver detalle" onClick={() => setGastoDetalle(g)} variant="success" size="sm" rounded="rounded-lg" iconSize={14} />
                           {g.estado === 'Pendiente' && (
                             <button
                               onClick={() => abrirAprobacion(g)}
-                              className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
+                              className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-2.5 py-1.5 rounded transition-colors"
                               title="Revisar gasto"
                             >
                               <ClipboardCheck size={13} /> Revisar
@@ -261,25 +257,20 @@ export default function TodosGastos() {
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <div>
                       <p className="text-sm font-medium text-gray-800">{g.empleado}</p>
-                      <p className="text-xs text-gray-500">{g.descripcion} · {g.categoria}</p>
+                      <p className="text-sm text-gray-500">{g.descripcion} · {g.categoria}</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-2 gap-2">
-                    <span className="text-xs text-gray-400">{g.fecha} · ${g.monto.toFixed(2)}</span>
+                    <span className="text-sm text-gray-600">{formatDate(g.fecha)} · ${g.monto.toFixed(2)}</span>
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => setGastoDetalle(g)}
-                        className="w-7 h-7 bg-green-100 hover:bg-green-200 text-green-600 rounded flex items-center justify-center"
-                      >
-                        <Eye size={14} />
-                      </button>
+                      <IconButton icon={Eye} label="Ver detalle" onClick={() => setGastoDetalle(g)} variant="success" rounded="rounded-lg" iconSize={14} />
                       {g.estado === 'Pendiente' && (
                         <button
                           onClick={() => abrirAprobacion(g)}
-                          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
+                          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-2.5 py-1.5 rounded transition-colors"
                         >
                           <ClipboardCheck size={13} /> Revisar
                         </button>
@@ -293,17 +284,13 @@ export default function TodosGastos() {
             {/* Paginación */}
             {totalPaginas > 1 && (
               <div className="flex items-center justify-between mt-4">
-                <p className="text-xs text-gray-400">{filtrados.length} resultados</p>
+                <p className="text-sm text-gray-600">{filtrados.length} resultados</p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => cambiarPagina(pagina - 1)} disabled={pagina === 1} className="p-1 rounded hover:bg-gray-100 disabled:opacity-30">
-                    <ChevronLeft size={16} />
-                  </button>
+                  <IconButton icon={ChevronLeft} label="Página anterior" onClick={() => cambiarPagina(pagina - 1)} disabled={pagina === 1} size="sm" rounded="rounded" iconSize={16} />
                   {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(n => (
                     <button key={n} onClick={() => cambiarPagina(n)} className={`w-7 h-7 rounded text-sm ${n === pagina ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{n}</button>
                   ))}
-                  <button onClick={() => cambiarPagina(pagina + 1)} disabled={pagina === totalPaginas} className="p-1 rounded hover:bg-gray-100 disabled:opacity-30">
-                    <ChevronRight size={16} />
-                  </button>
+                  <IconButton icon={ChevronRight} label="Página siguiente" onClick={() => cambiarPagina(pagina + 1)} disabled={pagina === totalPaginas} size="sm" rounded="rounded" iconSize={16} />
                 </div>
               </div>
             )}

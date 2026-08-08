@@ -27,22 +27,22 @@ export default function Reportes() {
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
         <div className="flex flex-wrap gap-3 items-end">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Período</label>
+            <label className="block text-sm text-gray-500 mb-1">Período</label>
             <select className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-white">
               <option>Este mes</option>
               <option>Último mes</option>
             </select>
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Desde</label>
+            <label className="block text-sm text-gray-500 mb-1">Desde</label>
             <input type="date" className="border border-gray-300 rounded px-2 py-1.5 text-sm" defaultValue="2024-01-05" />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Hasta</label>
+            <label className="block text-sm text-gray-500 mb-1">Hasta</label>
             <input type="date" className="border border-gray-300 rounded px-2 py-1.5 text-sm" defaultValue="2024-05-16" />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Agrupar por</label>
+            <label className="block text-sm text-gray-500 mb-1">Agrupar por</label>
             <select className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-white">
               <option>Categoría</option>
               <option>Empleado</option>
@@ -66,7 +66,7 @@ export default function Reportes() {
           { label: 'Total Pendiente', value: '$6,540.00', color: 'text-yellow-600' },
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-white rounded-xl shadow-sm p-3 sm:p-4">
-            <p className="text-xs text-gray-500 mb-1">{label}</p>
+            <p className="text-sm text-gray-500 mb-1">{label}</p>
             <p className={`text-lg sm:text-xl font-bold ${color}`}>{value}</p>
           </div>
         ))}
@@ -85,12 +85,12 @@ export default function Reportes() {
                 <Tooltip formatter={(v) => `${v}%`} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="space-y-1.5 text-xs">
+            <div className="space-y-1.5 text-sm">
               {pieData.map(({ name, value, monto, color }) => (
                 <div key={name} className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                   <span className="text-gray-600">{name} {value}%</span>
-                  <span className="text-gray-400 ml-auto">{monto}</span>
+                  <span className="text-gray-600 ml-auto">{monto}</span>
                 </div>
               ))}
             </div>

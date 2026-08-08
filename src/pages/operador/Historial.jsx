@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Download, Calendar, DollarSign } from 'lucide-react'
+import { ChevronDown, ChevronUp, FileSpreadsheet, FileText, Calendar, DollarSign } from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import EmptyState from '../../components/EmptyState'
 import toast from 'react-hot-toast'
+import { formatDate, formatDateRange } from '../../utils/date'
 
 const estadoBadge = {
   Aprobado: 'text-green-700 bg-green-100',
@@ -33,11 +34,11 @@ export default function Historial() {
       <div className="flex items-center justify-between mb-6 gap-2">
         <h1 className="text-xl font-bold text-gray-800">Historial de Gastos</h1>
         <div className="flex gap-2">
-          <button onClick={() => toast.success('Descargando Excel...')} className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
-            <Download size={14} /><span className="hidden sm:inline">Excel</span>
+          <button onClick={() => toast.success('Descargando Excel...')} aria-label="Descargar Excel" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
+            <FileSpreadsheet size={14} /><span className="hidden sm:inline">Excel</span>
           </button>
-          <button onClick={() => toast.success('Descargando PDF...')} className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
-            <Download size={14} /><span className="hidden sm:inline">PDF</span>
+          <button onClick={() => toast.success('Descargando PDF...')} aria-label="Descargar PDF" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
+            <FileText size={14} /><span className="hidden sm:inline">PDF</span>
           </button>
         </div>
       </div>
@@ -59,22 +60,22 @@ export default function Historial() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <p className="text-sm font-semibold text-gray-800">{v.nombre}</p>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${v.estado === 'activo' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <span className={`text-sm px-2 py-0.5 rounded-full font-medium ${v.estado === 'activo' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                       {v.estado}
                     </span>
                     {pendientes > 0 && (
-                      <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-700">
+                      <span className="text-sm px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-700">
                         {pendientes} pendiente{pendientes !== 1 ? 's' : ''}
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
-                    <span className="flex items-center gap-1"><Calendar size={11} />{v.fecha_inicio} → {v.fecha_fin}</span>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+                    <span className="flex items-center gap-1"><Calendar size={11} />{formatDateRange(v.fecha_inicio, v.fecha_fin)}</span>
                     <span className="flex items-center gap-1"><DollarSign size={11} />Total: ${total.toFixed(2)}</span>
                     <span>{gastos.length} gasto{gastos.length !== 1 ? 's' : ''}</span>
                   </div>
                 </div>
-                <span className="text-gray-400 flex-shrink-0">
+                <span className="text-gray-600 flex-shrink-0">
                   {abierto ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                 </span>
               </button>
@@ -83,14 +84,14 @@ export default function Historial() {
               {abierto && (
                 <div className="border-t">
                   {gastos.length === 0 ? (
-                    <p className="text-sm text-gray-400 text-center py-6">No hay gastos en este viaje</p>
+                    <p className="text-sm text-gray-600 text-center py-6">No hay gastos en este viaje</p>
                   ) : (
                     <>
                       {/* Tabla desktop */}
                       <div className="hidden sm:block overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="text-left text-xs text-gray-400 bg-gray-50 border-b">
+                            <tr className="text-left text-sm text-gray-600 bg-gray-50 border-b">
                               <th className="px-5 py-2 font-medium">Fecha</th>
                               <th className="px-5 py-2 font-medium">Descripción</th>
                               <th className="px-5 py-2 font-medium">Categoría</th>
@@ -101,12 +102,12 @@ export default function Historial() {
                           <tbody>
                             {gastos.map((g, i) => (
                               <tr key={i} className={`border-b last:border-0 transition-colors ${estadoFila[g.estado]}`}>
-                                <td className="px-5 py-2.5 text-gray-500 whitespace-nowrap">{g.fecha}</td>
+                                <td className="px-5 py-2.5 text-gray-500 whitespace-nowrap">{formatDate(g.fecha)}</td>
                                 <td className="px-5 py-2.5 text-gray-700">{g.descripcion}</td>
                                 <td className="px-5 py-2.5 text-gray-500">{g.categoria}</td>
                                 <td className="px-5 py-2.5 font-medium text-gray-800">${g.monto.toFixed(2)}</td>
                                 <td className="px-5 py-2.5">
-                                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                                  <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
                                 </td>
                               </tr>
                             ))}
@@ -120,18 +121,18 @@ export default function Historial() {
                           <div key={i} className={`p-4 flex items-start justify-between gap-2 transition-colors ${estadoFila[g.estado]}`}>
                             <div>
                               <p className="text-sm font-medium text-gray-800">{g.descripcion}</p>
-                              <p className="text-xs text-gray-400 mt-0.5">{g.categoria} · {g.fecha}</p>
+                              <p className="text-sm text-gray-600 mt-0.5">{g.categoria} · {formatDate(g.fecha)}</p>
                             </div>
                             <div className="flex flex-col items-end gap-1 flex-shrink-0">
                               <span className="text-sm font-semibold text-gray-800">${g.monto.toFixed(2)}</span>
-                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                              <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
                             </div>
                           </div>
                         ))}
                       </div>
 
                       {/* Resumen pie */}
-                      <div className="px-5 py-3 bg-gray-50 border-t flex justify-end text-xs text-gray-500 gap-4">
+                      <div className="px-5 py-3 bg-gray-50 border-t flex justify-end text-sm text-gray-500 gap-4">
                         <span>Total del viaje: <span className="font-semibold text-gray-800">${total.toFixed(2)}</span></span>
                       </div>
                     </>

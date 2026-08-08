@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, PlusSquare, FileText, History,
-  Bell, LogOut, Users, List, User,
+  LayoutDashboard, PlusSquare, History,
+  Bell, LogOut, Users, List,
   BarChart2, Tag, Menu, X, Plane, BookMarked
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import IconButton from '../components/IconButton'
 
 const operadorNav = [
   { to: '/operador/dashboard', icon: LayoutDashboard, label: 'Inicio' },
@@ -23,7 +24,6 @@ const adminNav = [
   { to: '/admin/categorias', icon: Tag, label: 'Categorías' },
   { to: '/admin/usuarios', icon: Users, label: 'Usuarios' },
   { to: '/admin/notificaciones', icon: Bell, label: 'Notificaciones' },
-  { to: '/admin/perfil', icon: User, label: 'Perfil' },
 ]
 
 function LogoutModal({ onConfirm, onCancel }) {
@@ -57,7 +57,7 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar }) {
           <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">S</div>
           <div>
             <p className="text-white font-bold text-sm leading-tight">SideBSide</p>
-            <p className="text-blue-300 text-[10px]">Gestión de gastos</p>
+            <p className="text-blue-300 text-xs">Gestión de gastos</p>
           </div>
         </div>
         {user && (
@@ -76,7 +76,7 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar }) {
             )}
             <div className="min-w-0">
               <p className="text-white text-sm font-semibold truncate">{user.nombre}</p>
-              <p className="text-blue-300 text-xs capitalize">Editar perfil</p>
+              <p className="text-blue-300 text-sm capitalize">Editar perfil</p>
             </div>
           </NavLink>
         )}
@@ -143,20 +143,16 @@ export default function DashboardLayout({ role }) {
 
       {/* Sidebar mobile drawer */}
       <aside className={`fixed top-0 left-0 h-full w-72 bg-[#1a2456] flex flex-col z-40 transition-transform duration-300 md:hidden ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-blue-200 hover:text-white p-1">
-          <X size={22} />
-        </button>
+        <IconButton icon={X} label="Cerrar menú" onClick={() => setMobileOpen(false)} variant="ghostOnDark" iconSize={22} className="absolute top-3 right-3" />
         <SidebarContent navItems={navItems} onLogout={() => { setMobileOpen(false); setLogoutModal(true) }} user={user} avatar={avatar} onNavigate={() => setMobileOpen(false)} />
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Barra top mobile */}
         <header className="md:hidden bg-[#1a2456] px-4 py-3 flex items-center gap-3 flex-shrink-0 shadow">
-          <button onClick={() => setMobileOpen(true)} className="text-white p-1 -ml-1">
-            <Menu size={24} />
-          </button>
+          <IconButton icon={Menu} label="Abrir menú" onClick={() => setMobileOpen(true)} variant="ghostOnDark" iconSize={24} className="-ml-1.5" />
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-xs">S</div>
+            <div className="w-7 h-7 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm">S</div>
             <span className="text-white font-bold text-sm">SideBSide</span>
           </div>
         </header>

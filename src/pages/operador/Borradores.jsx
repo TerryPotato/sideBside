@@ -3,7 +3,7 @@ import { Trash2, Send, BookMarked, AlertCircle } from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import toast from 'react-hot-toast'
 import ConfirmModal from '../../components/ConfirmModal'
-import EmptyState from '../../components/EmptyState'
+import { formatDate } from '../../utils/date'
 
 export default function Borradores() {
   const { borradores, eliminarBorrador } = useData()
@@ -46,7 +46,7 @@ export default function Borradores() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center text-center gap-3">
           <BookMarked size={40} className="text-gray-300" />
           <p className="text-base font-semibold text-gray-700">No tienes borradores guardados</p>
-          <p className="text-sm text-gray-400">Cuando guardes un gasto como borrador aparecerá aquí.</p>
+          <p className="text-sm text-gray-600">Cuando guardes un gasto como borrador aparecerá aquí.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -59,17 +59,17 @@ export default function Borradores() {
                       <span className="text-lg font-bold text-gray-900">{b.moneda} ${Number(b.monto).toFixed(2)}</span>
                     )}
                     {b.categoria && (
-                      <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full">{b.categoria}</span>
+                      <span className="text-sm bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full">{b.categoria}</span>
                     )}
                   </div>
                   {b.descripcion && <p className="text-sm text-gray-600 mb-1">{b.descripcion}</p>}
-                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-400">
-                    {b.fecha && <span>📅 {b.fecha}</span>}
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
+                    {b.fecha && <span>📅 {formatDate(b.fecha)}</span>}
                     {b.ubicacion && <span>📍 {b.ubicacion}</span>}
                     <span>💾 Guardado: {formatFecha(b.guardado_en)}</span>
                   </div>
                   {(!b.recibo && !b.factura) && (
-                    <div className="flex items-center gap-1 mt-2 text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded-lg w-fit">
+                    <div className="flex items-center gap-1 mt-2 text-sm text-yellow-600 bg-yellow-50 px-2 py-1 rounded-lg w-fit">
                       <AlertCircle size={12} /> Sin documentos adjuntos
                     </div>
                   )}

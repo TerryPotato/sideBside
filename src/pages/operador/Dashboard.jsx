@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Clock, CheckCircle, XCircle, Plus, ChevronRight, Plane, TrendingUp, FileText, BookMarked } from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import { useAuth } from '../../context/AuthContext'
+import { formatDateRange, formatDate } from '../../utils/date'
 
 const estadoBadge = {
   Aprobado: 'text-green-700 bg-green-100',
@@ -55,19 +56,19 @@ export default function DashboardOperador() {
                 <Plane size={18} className="text-white" />
               </div>
               <div>
-                <p className="text-xs text-blue-200 font-medium">Viaje activo</p>
+                <p className="text-sm text-blue-200 font-medium">Viaje activo</p>
                 <p className="font-bold text-sm leading-tight">{viajeActivo.nombre}</p>
               </div>
             </div>
-            <span className="text-xs bg-green-400/30 text-green-200 px-2 py-0.5 rounded-full font-semibold flex-shrink-0">Activo</span>
+            <span className="text-sm bg-green-400/30 text-green-200 px-2 py-0.5 rounded-full font-semibold flex-shrink-0">Activo</span>
           </div>
-          <div className="flex items-center justify-between text-xs text-blue-200 mb-2">
-            <span>📅 {viajeActivo.fecha_inicio} → {viajeActivo.fecha_fin}</span>
+          <div className="flex items-center justify-between text-sm text-blue-200 mb-2">
+            <span>📅 {formatDateRange(viajeActivo.fecha_inicio, viajeActivo.fecha_fin)}</span>
             <span>{gastosDeViajeActivo.length} gastos registrados</span>
           </div>
           {viajeActivo.presupuesto > 0 && (
             <div>
-              <div className="flex justify-between text-xs mb-1">
+              <div className="flex justify-between text-sm mb-1">
                 <span className="text-blue-200">Presupuesto utilizado</span>
                 <span className="text-white font-bold">${totalViaje.toLocaleString()} / ${viajeActivo.presupuesto.toLocaleString()}</span>
               </div>
@@ -75,7 +76,7 @@ export default function DashboardOperador() {
                 <div className={`h-full rounded-full transition-all ${pctPresupuesto >= 90 ? 'bg-red-400' : pctPresupuesto >= 70 ? 'bg-yellow-400' : 'bg-green-400'}`}
                   style={{ width: `${pctPresupuesto}%` }} />
               </div>
-              <p className={`text-xs mt-1 font-semibold ${pctPresupuesto >= 90 ? 'text-red-300' : 'text-blue-200'}`}>{pctPresupuesto}% utilizado</p>
+              <p className={`text-sm mt-1 font-semibold ${pctPresupuesto >= 90 ? 'text-red-300' : 'text-blue-200'}`}>{pctPresupuesto}% utilizado</p>
             </div>
           )}
         </div>
@@ -84,7 +85,7 @@ export default function DashboardOperador() {
           <Plane size={20} className="text-yellow-500 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-yellow-800">Sin viaje activo</p>
-            <p className="text-xs text-yellow-600">Pide a tu admin que te asigne un viaje para registrar gastos.</p>
+            <p className="text-sm text-yellow-600">Pide a tu admin que te asigne un viaje para registrar gastos.</p>
           </div>
         </div>
       )}
@@ -102,9 +103,9 @@ export default function DashboardOperador() {
               <Icon size={18} className={color} />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-gray-500">{label}</p>
+              <p className="text-sm font-semibold text-gray-500">{label}</p>
               <p className="text-2xl font-black text-gray-900 leading-tight">{value}</p>
-              <p className="text-xs text-gray-400">{sub}</p>
+              <p className="text-sm text-gray-600">{sub}</p>
             </div>
           </div>
         ))}
@@ -124,7 +125,7 @@ export default function DashboardOperador() {
           </div>
           <div>
             <span className="text-gray-800 font-bold text-sm block">Borradores</span>
-            <span className="text-xs text-gray-400">{borradores.length} guardado{borradores.length !== 1 ? 's' : ''}</span>
+            <span className="text-sm text-gray-600">{borradores.length} guardado{borradores.length !== 1 ? 's' : ''}</span>
           </div>
         </Link>
       </div>
@@ -133,12 +134,12 @@ export default function DashboardOperador() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
           <p className="font-bold text-gray-900 text-sm">Últimos gastos</p>
-          <Link to="/operador/historial" className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
+          <Link to="/operador/historial" className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700">
             Ver todos <ChevronRight size={14} />
           </Link>
         </div>
         {recientes.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">Aún no tienes gastos registrados</p>
+          <p className="text-sm text-gray-600 text-center py-8">Aún no tienes gastos registrados</p>
         ) : (
           <div className="divide-y divide-gray-50">
             {recientes.map((g, i) => (
@@ -146,11 +147,11 @@ export default function DashboardOperador() {
                 <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: estadoColor[g.estado] }} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-800 truncate">{g.descripcion}</p>
-                  <p className="text-xs text-gray-400">{g.categoria} · {g.fecha}</p>
+                  <p className="text-sm text-gray-600">{g.categoria} · {formatDate(g.fecha)}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-sm font-bold text-gray-900">${g.monto.toLocaleString()}</p>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${estadoBadge[g.estado]}`}>{g.estado}</span>
                 </div>
               </div>
             ))}
@@ -170,7 +171,7 @@ export default function DashboardOperador() {
             {pendientes > 0 && <div className="bg-yellow-400 transition-all" style={{ width: `${(pendientes / misGastos.length) * 100}%` }} />}
             {rechazados > 0 && <div className="bg-red-400 transition-all" style={{ width: `${(rechazados / misGastos.length) * 100}%` }} />}
           </div>
-          <div className="flex gap-4 text-xs text-gray-600">
+          <div className="flex gap-4 text-sm text-gray-600">
             <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-400 rounded-full" />Aprobados {Math.round((aprobados / misGastos.length) * 100)}%</span>
             <span className="flex items-center gap-1"><span className="w-2 h-2 bg-yellow-400 rounded-full" />Pendientes {Math.round((pendientes / misGastos.length) * 100)}%</span>
             {rechazados > 0 && <span className="flex items-center gap-1"><span className="w-2 h-2 bg-red-400 rounded-full" />Rechazados {Math.round((rechazados / misGastos.length) * 100)}%</span>}

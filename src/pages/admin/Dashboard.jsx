@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Clock, CheckCircle, XCircle, FileText, Plane, ChevronRight, Users, TrendingUp } from 'lucide-react'
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { useData } from '../../context/DataContext'
 
 const pieColors = ['#3b82f6', '#22c55e', '#f59e0b', '#a855f7', '#6b7280']
@@ -64,7 +64,7 @@ export default function DashboardAdmin() {
           </div>
           <div className="flex-1">
             <p className="font-bold text-yellow-900 text-sm">{pendientes.length} gastos esperan tu aprobación</p>
-            <p className="text-xs text-yellow-700">En {viajesConPendientes.length} viaje{viajesConPendientes.length !== 1 ? 's' : ''} · ${totalPendiente.toLocaleString()} MXN</p>
+            <p className="text-sm text-yellow-700">En {viajesConPendientes.length} viaje{viajesConPendientes.length !== 1 ? 's' : ''} · ${totalPendiente.toLocaleString()} MXN</p>
           </div>
           <ChevronRight size={18} className="text-yellow-600 flex-shrink-0" />
         </Link>
@@ -83,9 +83,9 @@ export default function DashboardAdmin() {
               <Icon size={20} className="text-white" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold opacity-80">{label}</p>
+              <p className="text-sm font-semibold opacity-80">{label}</p>
               <p className="text-3xl font-black leading-tight">{value}</p>
-              <p className="text-xs opacity-70">{sub}</p>
+              <p className="text-sm opacity-70">{sub}</p>
             </div>
           </div>
         ))}
@@ -130,14 +130,14 @@ export default function DashboardAdmin() {
                 {pieData.map((d, i) => (
                   <div key={d.name} className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: pieColors[i % pieColors.length] }} />
-                    <span className="text-xs text-gray-700 truncate flex-1">{d.name}</span>
-                    <span className="text-xs font-bold text-gray-900">${d.value.toLocaleString()}</span>
+                    <span className="text-sm text-gray-700 truncate flex-1">{d.name}</span>
+                    <span className="text-sm font-bold text-gray-900">${d.value.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-400 text-center py-8">Sin datos aún</p>
+            <p className="text-sm text-gray-600 text-center py-8">Sin datos aún</p>
           )}
         </div>
       </div>
@@ -152,12 +152,12 @@ export default function DashboardAdmin() {
               <Plane size={15} className="text-blue-600" />
               <p className="font-bold text-gray-900 text-sm">Viajes activos</p>
             </div>
-            <Link to="/admin/viajes" className="text-xs font-semibold text-blue-600 flex items-center gap-0.5">
+            <Link to="/admin/viajes" className="text-sm font-semibold text-blue-600 flex items-center gap-0.5">
               Ver todos <ChevronRight size={13} />
             </Link>
           </div>
           {viajesActivos.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">Sin viajes activos</p>
+            <p className="text-sm text-gray-600 text-center py-6">Sin viajes activos</p>
           ) : (
             <div className="divide-y divide-gray-50">
               {viajesActivos.slice(0, 4).map(v => {
@@ -170,10 +170,10 @@ export default function DashboardAdmin() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-800 truncate">{v.nombre}</p>
-                      <p className="text-xs text-gray-400">{v.usuario} · {gV.length} gasto{gV.length !== 1 ? 's' : ''}</p>
+                      <p className="text-sm text-gray-600">{v.usuario} · {gV.length} gasto{gV.length !== 1 ? 's' : ''}</p>
                     </div>
                     {pend > 0 && (
-                      <span className="text-xs bg-yellow-100 text-yellow-700 font-bold px-2 py-0.5 rounded-full flex-shrink-0">{pend}</span>
+                      <span className="text-sm bg-yellow-100 text-yellow-700 font-bold px-2 py-0.5 rounded-full flex-shrink-0">{pend}</span>
                     )}
                   </div>
                 )
@@ -189,12 +189,12 @@ export default function DashboardAdmin() {
               <FileText size={15} className="text-blue-600" />
               <p className="font-bold text-gray-900 text-sm">Actividad reciente</p>
             </div>
-            <Link to="/admin/todos-gastos" className="text-xs font-semibold text-blue-600 flex items-center gap-0.5">
+            <Link to="/admin/todos-gastos" className="text-sm font-semibold text-blue-600 flex items-center gap-0.5">
               Ver todos <ChevronRight size={13} />
             </Link>
           </div>
           {recientes.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">Sin actividad</p>
+            <p className="text-sm text-gray-600 text-center py-6">Sin actividad</p>
           ) : (
             <div className="divide-y divide-gray-50">
               {recientes.map((g, i) => (
@@ -202,11 +202,11 @@ export default function DashboardAdmin() {
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 ${g.estado === 'Aprobado' ? 'bg-green-500' : g.estado === 'Rechazado' ? 'bg-red-500' : 'bg-yellow-500'}`} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-800 truncate">{g.empleado}</p>
-                    <p className="text-xs text-gray-400 truncate">{g.descripcion} · {g.categoria}</p>
+                    <p className="text-sm text-gray-600 truncate">{g.descripcion} · {g.categoria}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-bold text-gray-900">${g.monto.toLocaleString()}</p>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${estadoBadge[g.estado]}`}>{g.estado}</span>
                   </div>
                 </div>
               ))}
@@ -222,7 +222,7 @@ export default function DashboardAdmin() {
             <Users size={15} className="text-blue-600" />
             <p className="font-bold text-gray-900 text-sm">Empleados activos</p>
           </div>
-          <Link to="/admin/usuarios" className="text-xs font-semibold text-blue-600 flex items-center gap-0.5">
+          <Link to="/admin/usuarios" className="text-sm font-semibold text-blue-600 flex items-center gap-0.5">
             Gestionar <ChevronRight size={13} />
           </Link>
         </div>
@@ -232,12 +232,12 @@ export default function DashboardAdmin() {
             const upend = ugastos.filter(g => g.estado === 'Pendiente').length
             return (
               <div key={u.id} className="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                   {u.nombre[0]}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-gray-800 truncate">{u.nombre.split(' ')[0]}</p>
-                  <p className="text-[10px] text-gray-400">{ugastos.length} gastos{upend > 0 ? ` · ${upend} pend.` : ''}</p>
+                  <p className="text-sm font-semibold text-gray-800 truncate">{u.nombre.split(' ')[0]}</p>
+                  <p className="text-xs text-gray-600">{ugastos.length} gastos{upend > 0 ? ` · ${upend} pend.` : ''}</p>
                 </div>
               </div>
             )

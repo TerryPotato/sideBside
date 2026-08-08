@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Plus, Pencil, X, Check } from 'lucide-react'
+import { Plus, Pencil, X, Check, Pipette } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import toast from 'react-hot-toast'
+import IconButton from '../../components/IconButton'
 
 const ICONOS_DISPONIBLES = [
   'UtensilsCrossed', 'Fuel', 'Milestone', 'Wrench', 'BedDouble',
@@ -41,15 +42,13 @@ function CategoriaCard({ cat, onEdit }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="font-semibold text-gray-900 text-sm">{cat.nombre}</p>
-          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${cat.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+          <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${cat.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
             {cat.activo ? 'Activa' : 'Inactiva'}
           </span>
         </div>
-        <p className="text-xs text-gray-500 truncate">{cat.descripcion}</p>
+        <p className="text-sm text-gray-500 truncate">{cat.descripcion}</p>
       </div>
-      <button onClick={() => onEdit(cat)} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 active:bg-gray-200 text-gray-600 border border-gray-200 flex-shrink-0 transition-colors">
-        <Pencil size={15} />
-      </button>
+      <IconButton icon={Pencil} label={`Editar ${cat.nombre}`} onClick={() => onEdit(cat)} iconSize={15} rounded="rounded-xl" />
     </div>
   )
 }
@@ -92,6 +91,11 @@ export default function Categorias() {
 
   const editorOpen = editando || showForm
 
+  function cerrarEditor() {
+    setEditando(null)
+    setShowForm(false)
+  }
+
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-5 gap-2">
@@ -101,22 +105,21 @@ export default function Categorias() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Lista */}
-        <div className="space-y-2.5">
-          {categorias.map(c => <CategoriaCard key={c.id} cat={c} onEdit={abrirEditar} />)}
-        </div>
+      <div className="space-y-2.5 max-w-2xl">
+        {categorias.map(c => <CategoriaCard key={c.id} cat={c} onEdit={abrirEditar} />)}
+      </div>
 
-        {/* Editor */}
-        {editorOpen && (
-          <div className="bg-white rounded-2xl border border-blue-100 shadow-sm p-5">
-            <div className="flex items-center justify-between mb-4">
+      {/* Editor */}
+      {editorOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={cerrarEditor} />
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg z-10 flex flex-col overflow-hidden" style={{ maxHeight: '92vh' }}>
+            <div className="flex items-center justify-between p-5 pb-4 border-b border-gray-100 flex-shrink-0">
               <p className="font-bold text-gray-900">{editando ? 'Editar categoría' : 'Nueva categoría'}</p>
-              <button onClick={() => { setEditando(null); setShowForm(false) }} className="text-gray-400 hover:text-gray-600 p-1">
-                <X size={18} />
-              </button>
+              <IconButton icon={X} label="Cerrar" onClick={cerrarEditor} size="sm" iconSize={18} />
             </div>
 
+            <div className="p-5 overflow-y-auto flex-1">
             {/* Preview */}
             <div className="flex items-center gap-3 mb-5 p-3 bg-gray-50 rounded-xl">
               {(() => { const Icono = LucideIcons[form.icono] ?? LucideIcons.Package; return (
@@ -129,21 +132,21 @@ export default function Categorias() {
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-gray-600 block mb-1.5">Nombre</label>
+                <label className="text-sm font-bold text-gray-600 block mb-1.5">Nombre</label>
                 <input value={form.nombre} onChange={e => set('nombre', e.target.value)}
                   className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" placeholder="Ej. Combustible" />
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-600 block mb-1.5">Descripción</label>
+                <label className="text-sm font-bold text-gray-600 block mb-1.5">Descripción</label>
                 <input value={form.descripcion} onChange={e => set('descripcion', e.target.value)}
                   className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" placeholder="Breve descripción" />
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-600 block mb-2">Icono</label>
+                <label className="text-sm font-bold text-gray-600 block mb-2">Icono</label>
                 <IconoPicker seleccionado={form.icono} onChange={v => set('icono', v)} />
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-600 block mb-2">Color</label>
+                <label className="text-sm font-bold text-gray-600 block mb-2">Color</label>
                 <div className="flex items-center gap-2 flex-wrap">
                   {COLORES.map(c => (
                     <button key={c} type="button" onClick={() => set('color', c)}
@@ -152,26 +155,37 @@ export default function Categorias() {
                       {form.color === c && <Check size={14} className="absolute inset-0 m-auto text-white" />}
                     </button>
                   ))}
-                  <input type="color" value={form.color} onChange={e => set('color', e.target.value)}
-                    className="w-8 h-8 rounded-full cursor-pointer border-2 border-gray-200 p-0.5" />
+                  <div className="relative w-8 h-8 rounded-full flex-shrink-0 hover:scale-110 active:scale-95 transition-transform"
+                    style={{ background: 'conic-gradient(from 0deg, #ef4444, #f59e0b, #eab308, #22c55e, #06b6d4, #3b82f6, #a855f7, #ec4899, #ef4444)' }}>
+                    <div className="absolute inset-[2px] rounded-full bg-white flex items-center justify-center pointer-events-none">
+                      <Pipette size={12} className="text-gray-600" />
+                    </div>
+                    <input type="color" value={form.color} onChange={e => set('color', e.target.value)}
+                      title="Color personalizado"
+                      className="absolute inset-0 w-full h-full rounded-full opacity-0 cursor-pointer" />
+                  </div>
                 </div>
               </div>
               {editando && (
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                   <span className="text-sm text-gray-700 flex-1">Estado: <span className="font-semibold">{form.activo ? 'Activa' : 'Inactiva'}</span></span>
                   <button type="button" onClick={() => set('activo', !form.activo)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${form.activo ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                    className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-colors ${form.activo ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
                     {form.activo ? 'Desactivar' : 'Activar'}
                   </button>
                 </div>
               )}
+            </div>
+            </div>
+
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
               <button onClick={handleGuardar} className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 rounded-xl text-sm transition-colors">
                 {editando ? 'Guardar cambios' : 'Crear categoría'}
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { Plus, X, MapPin, Calendar, User, DollarSign } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useData } from '../../context/DataContext'
 import AprobacionModal from '../../components/AprobacionModal'
+import { formatDateRange } from '../../utils/date'
 
 const estadoChip = {
   activo: 'bg-green-100 text-green-700',
@@ -64,7 +65,7 @@ export default function Viajes() {
         <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-blue-100">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-gray-700">Nuevo viaje</h2>
-            <button onClick={() => { setShowForm(false); setErrors({}) }} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+            <button onClick={() => { setShowForm(false); setErrors({}) }} className="text-gray-600 hover:text-gray-600"><X size={18} /></button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -77,7 +78,7 @@ export default function Viajes() {
                   onChange={e => set('nombre', e.target.value)}
                   className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.nombre ? 'border-red-400' : 'border-gray-300'}`}
                 />
-                {errors.nombre && <p className="text-xs text-red-500 mt-1">{errors.nombre}</p>}
+                {errors.nombre && <p className="text-sm text-red-500 mt-1">{errors.nombre}</p>}
               </div>
               <div>
                 <label className="block text-sm text-gray-600 mb-1">Empleado <span className="text-red-500">*</span></label>
@@ -89,10 +90,10 @@ export default function Viajes() {
                   <option value="">Seleccionar empleado</option>
                   {operadores.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
                 </select>
-                {errors.usuario_id && <p className="text-xs text-red-500 mt-1">{errors.usuario_id}</p>}
+                {errors.usuario_id && <p className="text-sm text-red-500 mt-1">{errors.usuario_id}</p>}
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Presupuesto <span className="text-gray-400 font-normal">(opcional)</span></label>
+                <label className="block text-sm text-gray-600 mb-1">Presupuesto <span className="text-gray-600 font-normal">(opcional)</span></label>
                 <input
                   type="number"
                   placeholder="$ 0.00"
@@ -109,7 +110,7 @@ export default function Viajes() {
                   onChange={e => set('fecha_inicio', e.target.value)}
                   className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.fecha_inicio ? 'border-red-400' : 'border-gray-300'}`}
                 />
-                {errors.fecha_inicio && <p className="text-xs text-red-500 mt-1">{errors.fecha_inicio}</p>}
+                {errors.fecha_inicio && <p className="text-sm text-red-500 mt-1">{errors.fecha_inicio}</p>}
               </div>
               <div>
                 <label className="block text-sm text-gray-600 mb-1">Fecha fin <span className="text-red-500">*</span></label>
@@ -119,7 +120,7 @@ export default function Viajes() {
                   onChange={e => set('fecha_fin', e.target.value)}
                   className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.fecha_fin ? 'border-red-400' : 'border-gray-300'}`}
                 />
-                {errors.fecha_fin && <p className="text-xs text-red-500 mt-1">{errors.fecha_fin}</p>}
+                {errors.fecha_fin && <p className="text-sm text-red-500 mt-1">{errors.fecha_fin}</p>}
               </div>
             </div>
             <div className="flex gap-3 pt-1">
@@ -141,16 +142,16 @@ export default function Viajes() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h3 className="text-sm font-semibold text-gray-800">{v.nombre}</h3>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${estadoChip[v.estado]}`}>{v.estado}</span>
+                    <span className={`text-sm px-2 py-0.5 rounded-full font-medium ${estadoChip[v.estado]}`}>{v.estado}</span>
                     {pendientes > 0 && (
-                      <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-700">
+                      <span className="text-sm px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-700">
                         {pendientes} pendiente{pendientes !== 1 ? 's' : ''}
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
                     <span className="flex items-center gap-1"><User size={12} />{v.usuario}</span>
-                    <span className="flex items-center gap-1"><Calendar size={12} />{v.fecha_inicio} → {v.fecha_fin}</span>
+                    <span className="flex items-center gap-1"><Calendar size={12} />{formatDateRange(v.fecha_inicio, v.fecha_fin)}</span>
                     {v.presupuesto > 0 && <span className="flex items-center gap-1"><DollarSign size={12} />Presupuesto: ${v.presupuesto.toLocaleString()}</span>}
                     <span className="flex items-center gap-1"><MapPin size={12} />{gastos.length} gasto{gastos.length !== 1 ? 's' : ''} registrado{gastos.length !== 1 ? 's' : ''}</span>
                   </div>
