@@ -4,17 +4,21 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveCo
 import { useData } from '../../context/DataContext'
 
 const pieColors = ['#3b82f6', '#22c55e', '#f59e0b', '#a855f7', '#6b7280']
-
-const barData = [
-  { mes: 'Ene', monto: 8200 },
-  { mes: 'Feb', monto: 12400 },
-  { mes: 'Mar', monto: 18900 },
-  { mes: 'Abr', monto: 22100 },
-  { mes: 'May', monto: 30500 },
-]
+const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
 export default function DashboardAdmin() {
   const { viajes, gastos, usuariosList } = useData()
+
+  // Gastos por mes (ultimos 6 con datos) para la grafica de tendencia.
+  const montosPorMes = gastos.reduce((acc, g) => {
+    const key = g.fecha.slice(0, 7) // "YYYY-MM"
+    acc[key] = (acc[key] || 0) + g.monto
+    return acc
+  }, {})
+  const barData = Object.entries(montosPorMes)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-6)
+    .map(([key, monto]) => ({ mes: MESES[Number(key.slice(5, 7)) - 1], monto }))
 
   const pendientes = gastos.filter(g => g.estado === 'Pendiente')
   const aprobados = gastos.filter(g => g.estado === 'Aprobado')
@@ -48,7 +52,7 @@ export default function DashboardAdmin() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Panel de control</h1>
-          <p className="text-sm text-gray-500">Vista general de la operación</p>
+          <p className="text-sm text-gray-700">Vista general de la operación</p>
         </div>
         <Link to="/admin/viajes"
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-sm shadow-md shadow-blue-200 transition-colors flex-shrink-0">
@@ -73,7 +77,7 @@ export default function DashboardAdmin() {
       {/* Stats 4 tarjetas en grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { icon: Clock, grad: 'from-yellow-400 to-orange-400', label: 'Pendientes', value: pendientes.length, sub: `$${totalPendiente.toLocaleString()} MXN` },
+          { icon: Clock, grad: 'from-amber-600 to-orange-600', label: 'Pendientes', value: pendientes.length, sub: `$${totalPendiente.toLocaleString()} MXN` },
           { icon: CheckCircle, grad: 'from-green-500 to-emerald-500', label: 'Aprobados', value: aprobados.length, sub: `$${totalAprobado.toLocaleString()} MXN` },
           { icon: XCircle, grad: 'from-red-500 to-rose-500', label: 'Rechazados', value: rechazados.length, sub: `${gastos.length > 0 ? Math.round((rechazados.length / gastos.length) * 100) : 0}% del total` },
           { icon: FileText, grad: 'from-blue-600 to-indigo-600', label: 'Total gastos', value: gastos.length, sub: `${viajesActivos.length} viajes activos` },
@@ -95,7 +99,7 @@ export default function DashboardAdmin() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
         {/* Gráfica tendencia mensual */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <div className="bg-white rounded-2xl border border-black shadow-sm p-4">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp size={16} className="text-blue-600" />
             <p className="font-bold text-gray-900 text-sm">Gastos por mes</p>
@@ -111,7 +115,7 @@ export default function DashboardAdmin() {
         </div>
 
         {/* Pie por categoría */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <div className="bg-white rounded-2xl border border-black shadow-sm p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-4 h-4 rounded-full bg-blue-600" />
             <p className="font-bold text-gray-900 text-sm">Por categoría</p>
@@ -146,7 +150,7 @@ export default function DashboardAdmin() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
         {/* Viajes activos */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <Plane size={15} className="text-blue-600" />
@@ -183,7 +187,7 @@ export default function DashboardAdmin() {
         </div>
 
         {/* Actividad reciente */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <FileText size={15} className="text-blue-600" />
@@ -216,7 +220,7 @@ export default function DashboardAdmin() {
       </div>
 
       {/* Resumen empleados */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-2xl border border-black shadow-sm p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Users size={15} className="text-blue-600" />

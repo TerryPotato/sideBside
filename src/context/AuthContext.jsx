@@ -1,33 +1,44 @@
 import { createContext, useContext, useState } from 'react'
+import * as authApi from '../api/auth'
+import { getToken, getUser, setSession, clearSession } from '../api/session'
 
 const AuthContext = createContext(null)
 
 const avatarDefault = { tipo: 'color', valor: '#6366f1', foto: null }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('sbs_user') ?? sessionStorage.getItem('sbs_user')
-    return saved ? JSON.parse(saved) : null
-  })
+  const [user, setUser] = useState(() => getUser())
 
   const [avatar, setAvatar] = useState(() => {
     const saved = localStorage.getItem('sbs_avatar')
     return saved ? JSON.parse(saved) : avatarDefault
   })
 
-  function login(email, password, remember = false) {
-    const rol = email.startsWith('admin') ? 'admin' : 'operador'
-    const u = { email, nombre: rol === 'admin' ? 'Ana Martínez' : 'Carlos López', rol }
-    const storage = remember ? localStorage : sessionStorage
-    storage.setItem('sbs_user', JSON.stringify(u))
-    setUser(u)
-    return rol
+  async function login(email, password) {
+    const { token, usuario } = await authApi.login(email, password)
+    setSession(token, usuario)
+    setUser(usuario)
+    return usuario.rol
   }
 
-  function logout() {
-    localStorage.removeItem('sbs_user')
-    sessionStorage.removeItem('sbs_user')
+  async function logout() {
+    try {
+      await authApi.logout()
+    } catch {
+      // Sesion stateless: si la llamada falla igual se limpia localmente.
+    }
+    clearSession()
     setUser(null)
+  }
+
+  // Actualiza campos del usuario en memoria + sesion (ej. zona_horaria)
+  // sin requerir un nuevo login.
+  function updateUser(cambios) {
+    setUser(prev => {
+      const next = { ...prev, ...cambios }
+      setSession(getToken(), next)
+      return next
+    })
   }
 
   function updateAvatar(nuevoAvatar) {
@@ -37,7 +48,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, avatar, updateAvatar }}>
+    <AuthContext.Provider value={{ user, login, logout, avatar, updateAvatar, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

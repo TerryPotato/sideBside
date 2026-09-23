@@ -1,9 +1,11 @@
-import { useState } from 'react'
-import { Plus, Pencil, X, Check, Pipette } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Plus, Pencil, Trash2, X, Check, Pipette } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import toast from 'react-hot-toast'
 import IconButton from '../../components/IconButton'
+import ConfirmModal from '../../components/ConfirmModal'
+import FieldHint from '../../components/FieldHint'
 
 const ICONOS_DISPONIBLES = [
   'UtensilsCrossed', 'Fuel', 'Milestone', 'Wrench', 'BedDouble',
@@ -22,7 +24,7 @@ function IconoPicker({ seleccionado, onChange }) {
         const activo = seleccionado === nombre
         return (
           <button key={nombre} type="button" onClick={() => onChange(nombre)}
-            className={`w-10 h-10 flex items-center justify-center rounded-xl border-2 transition-all ${activo ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+            className={`w-10 h-10 flex items-center justify-center rounded-xl border-2 transition-all ${activo ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-700 hover:border-gray-300'}`}>
             <Icono size={18} />
           </button>
         )
@@ -31,24 +33,20 @@ function IconoPicker({ seleccionado, onChange }) {
   )
 }
 
-function CategoriaCard({ cat, onEdit }) {
+function CategoriaCard({ cat, onEdit, onDelete }) {
   const Icono = LucideIcons[cat.icono] ?? LucideIcons.Package
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-3">
+    <div className="bg-white rounded-2xl border border-black shadow-sm p-4 flex items-center gap-3">
       <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
         style={{ backgroundColor: cat.color + '22' }}>
         <Icono size={20} style={{ color: cat.color }} />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className="font-semibold text-gray-900 text-sm">{cat.nombre}</p>
-          <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${cat.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-            {cat.activo ? 'Activa' : 'Inactiva'}
-          </span>
-        </div>
-        <p className="text-sm text-gray-500 truncate">{cat.descripcion}</p>
+        <p className="font-semibold text-gray-900 text-sm">{cat.nombre}</p>
+        <p className="text-sm text-gray-700 truncate">{cat.descripcion}</p>
       </div>
       <IconButton icon={Pencil} label={`Editar ${cat.nombre}`} onClick={() => onEdit(cat)} iconSize={15} rounded="rounded-xl" />
+      <IconButton icon={Trash2} label={`Eliminar ${cat.nombre}`} onClick={() => onDelete(cat)} variant="danger" iconSize={15} rounded="rounded-xl" />
     </div>
   )
 }
@@ -56,10 +54,27 @@ function CategoriaCard({ cat, onEdit }) {
 const emptyForm = { nombre: '', descripcion: '', color: '#3b82f6', icono: 'Package', activo: true }
 
 export default function Categorias() {
-  const { categorias, actualizarCategoria, crearCategoria } = useData()
+  const { categorias, actualizarCategoria, crearCategoria, eliminarCategoria } = useData()
   const [editando, setEditando] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(emptyForm)
+  const [tab, setTab] = useState('activas')
+  const [deleteTarget, setDeleteTarget] = useState(null)
+
+  const activas = useMemo(() => categorias.filter(c => c.activo), [categorias])
+  const inactivas = useMemo(() => categorias.filter(c => !c.activo), [categorias])
+  const visibles = tab === 'activas' ? activas : inactivas
+
+  async function confirmarEliminar() {
+    try {
+      const mensaje = await eliminarCategoria(deleteTarget.id)
+      toast.success(mensaje)
+    } catch (err) {
+      toast.error(err.message)
+    } finally {
+      setDeleteTarget(null)
+    }
+  }
 
   function set(f, v) { setForm(p => ({ ...p, [f]: v })) }
 
@@ -75,18 +90,22 @@ export default function Categorias() {
     setShowForm(true)
   }
 
-  function handleGuardar() {
+  async function handleGuardar() {
     if (!form.nombre.trim()) { toast.error('El nombre es requerido'); return }
-    if (editando) {
-      actualizarCategoria(editando.id, form)
-      toast.success('Categoría actualizada')
-      setEditando(null)
-    } else {
-      crearCategoria(form)
-      toast.success('Categoría creada')
-      setShowForm(false)
+    try {
+      if (editando) {
+        await actualizarCategoria(editando.id, form)
+        toast.success('Categoría actualizada')
+        setEditando(null)
+      } else {
+        await crearCategoria(form)
+        toast.success('Categoría creada')
+        setShowForm(false)
+      }
+      setForm(emptyForm)
+    } catch (err) {
+      toast.error(err.message)
     }
-    setForm(emptyForm)
   }
 
   const editorOpen = editando || showForm
@@ -98,15 +117,46 @@ export default function Categorias() {
 
   return (
     <div className="p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-5 gap-2">
-        <h1 className="text-xl font-bold text-gray-900">Categorías</h1>
-        <button onClick={abrirNueva} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors shadow-sm">
+      <div className="flex items-start justify-between mb-5 gap-2">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Categorías</h1>
+          <p className="text-sm text-gray-700 mt-0.5">Administra las categorías disponibles para clasificar los gastos. Da clic en una para editarla o desactivarla.</p>
+        </div>
+        <button onClick={abrirNueva} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors shadow-sm flex-shrink-0">
           <Plus size={16} /> Nueva
         </button>
       </div>
 
-      <div className="space-y-2.5 max-w-2xl">
-        {categorias.map(c => <CategoriaCard key={c.id} cat={c} onEdit={abrirEditar} />)}
+      <ConfirmModal
+        open={!!deleteTarget}
+        title={`¿Eliminar "${deleteTarget?.nombre}"?`}
+        message="Si no tiene gastos registrados se elimina por completo. Si ya tiene gastos asociados, se desactiva en su lugar para no afectar el historial."
+        confirmLabel="Eliminar"
+        confirmClass="bg-red-600 hover:bg-red-700"
+        onConfirm={confirmarEliminar}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
+      <div className="flex items-center gap-1 mb-4 border-b border-gray-200">
+        {[{ key: 'activas', label: 'Activas', items: activas }, { key: 'inactivas', label: 'Inactivas', items: inactivas }].map(t => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${tab === t.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-800'}`}
+          >
+            {t.label} <span className="ml-1 text-sm font-normal text-gray-700">({t.items.length})</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {visibles.length === 0 ? (
+          <p className="text-sm text-gray-700 py-6 text-center col-span-full">
+            {tab === 'activas' ? 'No hay categorías activas' : 'No hay categorías inactivas'}
+          </p>
+        ) : (
+          visibles.map(c => <CategoriaCard key={c.id} cat={c} onEdit={abrirEditar} onDelete={setDeleteTarget} />)
+        )}
       </div>
 
       {/* Editor */}
@@ -132,21 +182,21 @@ export default function Categorias() {
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-bold text-gray-600 block mb-1.5">Nombre</label>
+                <label className="flex items-center text-sm font-bold text-gray-600 mb-1.5">Nombre<FieldHint text="El nombre de la categoría, tal como aparecerá al seleccionar un gasto." /></label>
                 <input value={form.nombre} onChange={e => set('nombre', e.target.value)}
                   className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" placeholder="Ej. Combustible" />
               </div>
               <div>
-                <label className="text-sm font-bold text-gray-600 block mb-1.5">Descripción</label>
+                <label className="flex items-center text-sm font-bold text-gray-600 mb-1.5">Descripción<FieldHint text="Un texto opcional que ayude a distinguir esta categoría de otras parecidas." /></label>
                 <input value={form.descripcion} onChange={e => set('descripcion', e.target.value)}
                   className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" placeholder="Breve descripción" />
               </div>
               <div>
-                <label className="text-sm font-bold text-gray-600 block mb-2">Icono</label>
+                <label className="flex items-center text-sm font-bold text-gray-600 mb-2">Icono<FieldHint text="El ícono que representará esta categoría en toda la plataforma." /></label>
                 <IconoPicker seleccionado={form.icono} onChange={v => set('icono', v)} />
               </div>
               <div>
-                <label className="text-sm font-bold text-gray-600 block mb-2">Color</label>
+                <label className="flex items-center text-sm font-bold text-gray-600 mb-2">Color<FieldHint text="El color que identificará esta categoría en gráficas y etiquetas." /></label>
                 <div className="flex items-center gap-2 flex-wrap">
                   {COLORES.map(c => (
                     <button key={c} type="button" onClick={() => set('color', c)}

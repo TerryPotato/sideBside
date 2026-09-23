@@ -1,66 +1,138 @@
-import { createContext, useContext, useState } from 'react'
-import reciboEjemplo from '../assets/recibo-generico.jpg'
-
-const usuarios = [
-  { id: 1, nombre: 'Carlos López', email: 'carlos@empresa.com', num_empleado: 'EMP-001' },
-  { id: 2, nombre: 'María García', email: 'maria@empresa.com', num_empleado: 'EMP-002' },
-  { id: 3, nombre: 'Juan Pérez', email: 'juan@empresa.com', num_empleado: 'EMP-003' },
-  { id: 4, nombre: 'Luis Hernández', email: 'luis@empresa.com', num_empleado: 'EMP-004' },
-]
-
-const viajesIniciales = [
-  { id: 1, nombre: 'Visita cliente Monterrey', usuario_id: 1, usuario: 'Carlos López', fecha_inicio: '2024-05-10', fecha_fin: '2024-05-15', presupuesto: 5000, estado: 'activo' },
-  { id: 2, nombre: 'Feria industrial CDMX', usuario_id: 2, usuario: 'María García', fecha_inicio: '2024-05-12', fecha_fin: '2024-05-14', presupuesto: 3000, estado: 'activo' },
-  { id: 3, nombre: 'Capacitación Guadalajara', usuario_id: 3, usuario: 'Juan Pérez', fecha_inicio: '2024-04-20', fecha_fin: '2024-04-25', presupuesto: 4000, estado: 'completado' },
-]
-
-const gastosIniciales = [
-  { id: 1, viaje_id: 1, usuario_id: 1, empleado: 'Carlos López', categoria: 'Combustible', descripcion: 'Gasolina autopista Mty', monto: 800, moneda: 'MXN', fecha: '2024-05-13', estado: 'Pendiente', preview: reciboEjemplo, ubicacion: 'Monterrey, NL' },
-  { id: 2, viaje_id: 1, usuario_id: 1, empleado: 'Carlos López', categoria: 'Comida', descripcion: 'Cena con cliente', monto: 350, moneda: 'MXN', fecha: '2024-05-13', estado: 'Pendiente', preview: reciboEjemplo, ubicacion: 'Monterrey, NL' },
-  { id: 3, viaje_id: 1, usuario_id: 1, empleado: 'Carlos López', categoria: 'Peaje', descripcion: 'Casetas autopista', monto: 120, moneda: 'MXN', fecha: '2024-05-11', estado: 'Aprobado', preview: reciboEjemplo, ubicacion: 'Monterrey, NL' },
-  { id: 4, viaje_id: 2, usuario_id: 2, empleado: 'María García', categoria: 'Comida', descripcion: 'Almuerzo de trabajo', monto: 280, moneda: 'MXN', fecha: '2024-05-12', estado: 'Pendiente', preview: reciboEjemplo, ubicacion: 'CDMX' },
-  { id: 5, viaje_id: 2, usuario_id: 2, empleado: 'María García', categoria: 'Transporte', descripcion: 'Uber al evento', monto: 95, moneda: 'MXN', fecha: '2024-05-12', estado: 'Pendiente', preview: reciboEjemplo, ubicacion: 'CDMX' },
-  { id: 6, viaje_id: 3, usuario_id: 3, empleado: 'Juan Pérez', categoria: 'Hospedaje', descripcion: 'Hotel 2 noches', monto: 1800, moneda: 'MXN', fecha: '2024-04-21', estado: 'Aprobado', preview: reciboEjemplo, ubicacion: 'Guadalajara' },
-]
-
-const categoriasIniciales = [
-  { id: 1, nombre: 'Combustible', descripcion: 'Gasolina y diésel', color: '#3b82f6', icono: 'Fuel', activo: true },
-  { id: 2, nombre: 'Comida', descripcion: 'Alimentos y restaurantes', color: '#22c55e', icono: 'UtensilsCrossed', activo: true },
-  { id: 3, nombre: 'Peaje', descripcion: 'Casetas y estacionamientos', color: '#f59e0b', icono: 'Milestone', activo: true },
-  { id: 4, nombre: 'Mantenimiento', descripcion: 'Servicios de mantenimiento', color: '#a855f7', icono: 'Wrench', activo: true },
-  { id: 5, nombre: 'Hospedaje', descripcion: 'Hoteles y hospedajes', color: '#0ea5e9', icono: 'BedDouble', activo: true },
-  { id: 6, nombre: 'Transporte', descripcion: 'Transporte público o privado', color: '#6b7280', icono: 'Bus', activo: false },
-  { id: 7, nombre: 'Otros', descripcion: 'Otros gastos no clasificados', color: '#ec4899', icono: 'Package', activo: true },
-]
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import toast from 'react-hot-toast'
+import { useAuth } from './AuthContext'
+import * as viajesApi from '../api/viajes'
+import * as gastosApi from '../api/gastos'
+import * as categoriasApi from '../api/categorias'
+import * as usuariosApi from '../api/usuarios'
+import * as notificacionesApi from '../api/notificaciones'
 
 const DataContext = createContext(null)
 
+// El backend maneja los estados de gasto en minuscula ('pendiente',
+// 'aprobado', 'rechazado'); el front los usa capitalizados en badges y
+// comparaciones ('Pendiente', 'Aprobado', 'Rechazado') desde que era mock.
+function normalizarGasto(g) {
+  return { ...g, estado: g.estado.charAt(0).toUpperCase() + g.estado.slice(1) }
+}
+
+function normalizarCategoria(c) {
+  return { ...c, activo: c.estado === 'activo' }
+}
+
 export function DataProvider({ children }) {
-  const [viajes, setViajes] = useState(viajesIniciales)
-  const [gastos, setGastos] = useState(gastosIniciales)
-  const [categorias, setCategorias] = useState(categoriasIniciales)
-  const [usuariosList, setUsuariosList] = useState(usuarios)
-  const [borradores, setBorradores] = useState([])
+  const { user } = useAuth()
+  const [viajes, setViajes] = useState([])
+  const [gastos, setGastos] = useState([])
+  const [categorias, setCategorias] = useState([])
+  const [usuariosList, setUsuariosList] = useState([])
+  const [notificaciones, setNotificaciones] = useState([])
+  const borradores = gastos.filter(g => g.estado === 'Borrador')
 
-  function crearViaje(data) {
-    const usuario = usuariosList.find(u => u.id === Number(data.usuario_id))
-    setViajes(prev => [{ ...data, id: Date.now(), usuario: usuario?.nombre ?? '', estado: 'activo' }, ...prev])
+  const recargarViajes = useCallback(async () => setViajes(await viajesApi.listar()), [])
+  const recargarGastos = useCallback(async () => setGastos((await gastosApi.listar()).map(normalizarGasto)), [])
+  const recargarCategorias = useCallback(async () => setCategorias((await categoriasApi.listar()).map(normalizarCategoria)), [])
+  const recargarUsuarios = useCallback(async () => {
+    const filas = await usuariosApi.listar()
+    setUsuariosList(filas.filter(u => u.estado === 'activo'))
+  }, [])
+  const recargarNotificaciones = useCallback(async () => setNotificaciones(await notificacionesApi.listar()), [])
+
+  useEffect(() => {
+    if (!user) {
+      setViajes([])
+      setGastos([])
+      setCategorias([])
+      setUsuariosList([])
+      setNotificaciones([])
+      return
+    }
+    recargarCategorias().catch(err => toast.error(err.message))
+    recargarGastos().catch(err => toast.error(err.message))
+    recargarViajes().catch(err => toast.error(err.message))
+    recargarNotificaciones().catch(err => toast.error(err.message))
+    // GET /api/usuarios es solo-admin: un operador recibiria 403.
+    if (user.rol === 'admin') {
+      recargarUsuarios().catch(err => toast.error(err.message))
+    } else {
+      setUsuariosList([])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
+
+  // Refresco periodico para que el badge de no-leidas y la pantalla de
+  // notificaciones no dependan de que el usuario navegue a otra pagina.
+  // Silencioso a proposito: un blip de red cada 60s no debe interrumpir con
+  // un toast.
+  useEffect(() => {
+    if (!user) return
+    const id = setInterval(() => {
+      recargarNotificaciones().catch(() => {})
+    }, 60000)
+    return () => clearInterval(id)
+  }, [user?.id, recargarNotificaciones])
+
+  async function crearViaje(data) {
+    await viajesApi.crear({
+      nombre: data.nombre,
+      usuario_id: Number(data.usuario_id),
+      fecha_inicio: data.fecha_inicio,
+      fecha_fin: data.fecha_fin,
+      presupuesto: Number(data.presupuesto) || 0,
+    })
+    await recargarViajes()
   }
 
-  function agregarGasto(gasto) {
-    setGastos(prev => [{ ...gasto, id: Date.now() }, ...prev])
+  // No manda usuario_id: el backend (viajes.controller actualizar) no lo
+  // acepta, el operador asignado no se puede cambiar despues de creado.
+  async function actualizarViaje(id, cambios) {
+    await viajesApi.actualizar(id, {
+      nombre: cambios.nombre,
+      fecha_inicio: cambios.fecha_inicio,
+      fecha_fin: cambios.fecha_fin,
+      presupuesto: cambios.presupuesto === undefined ? undefined : Number(cambios.presupuesto) || 0,
+      estado: cambios.estado,
+    })
+    await recargarViajes()
   }
 
-  function aprobarGasto(id) {
-    setGastos(prev => prev.map(g => g.id === id ? { ...g, estado: 'Aprobado' } : g))
+  async function agregarGasto(gasto) {
+    const categoriaObj = categorias.find(c => c.nombre === gasto.categoria)
+    if (!categoriaObj) throw new Error('Selecciona una categoria valida')
+
+    const { id } = await gastosApi.crear({
+      viaje_id: Number(gasto.viaje_id),
+      categoria_id: categoriaObj.id,
+      monto: Number(gasto.monto),
+      iva: gasto.iva ? Number(gasto.iva) : 0,
+      moneda: gasto.moneda,
+      descripcion: gasto.descripcion || null,
+      ubicacion: gasto.ubicacion || null,
+      fecha: gasto.fecha,
+      enviar: gasto.enviar ?? true,
+    })
+
+    if (gasto.recibo) {
+      await gastosApi.subirComprobante(id, gasto.recibo)
+    }
+    if (gasto.facturaPdf) {
+      await gastosApi.subirFactura(id, gasto.facturaPdf)
+    }
+    if (gasto.facturaXml) {
+      await gastosApi.subirFacturaXml(id, gasto.facturaXml)
+    }
+
+    await recargarGastos()
   }
 
-  function rechazarGasto(id, comentario) {
-    setGastos(prev => prev.map(g => g.id === id ? { ...g, estado: 'Rechazado', comentario } : g))
+  async function aprobarGasto(id) {
+    await gastosApi.aprobar(id)
+    await recargarGastos()
   }
 
-  function revertirGasto(id) {
-    setGastos(prev => prev.map(g => g.id === id ? { ...g, estado: 'Pendiente', comentario: undefined } : g))
+  async function rechazarGasto(id, comentario) {
+    await gastosApi.rechazar(id, comentario)
+    await recargarGastos()
   }
 
   function gastosDeViaje(viaje_id) {
@@ -71,38 +143,116 @@ export function DataProvider({ children }) {
     return viajes.filter(v => v.usuario_id === usuario_id && v.estado === 'activo')
   }
 
-  function saveDraft(data) {
-    setBorradores(prev => [{ ...data, id: Date.now(), guardado_en: new Date().toISOString() }, ...prev])
+  // Edicion de un borrador (o de un gasto pendiente) desde
+  // NuevoGasto en modo edicion: el gasto ya existe en la BD, se actualiza
+  // con los datos del formulario y, si el usuario elige "Enviar gasto" en
+  // vez de "Guardar como borrador", enviar:true lo transiciona a pendiente
+  // y dispara la notificacion al admin igual que un envio normal. No manda
+  // viaje_id: actualizar() en el backend no lo acepta, el viaje de un gasto
+  // no se puede cambiar despues de creado.
+  async function actualizarGasto(id, gasto) {
+    const categoriaObj = categorias.find(c => c.nombre === gasto.categoria)
+    if (!categoriaObj) throw new Error('Selecciona una categoria valida')
+
+    await gastosApi.actualizar(id, {
+      categoria_id: categoriaObj.id,
+      monto: Number(gasto.monto),
+      iva: gasto.iva ? Number(gasto.iva) : 0,
+      moneda: gasto.moneda,
+      descripcion: gasto.descripcion || null,
+      ubicacion: gasto.ubicacion || null,
+      fecha: gasto.fecha,
+      enviar: gasto.enviar ?? false,
+    })
+
+    if (gasto.recibo) await gastosApi.subirComprobante(id, gasto.recibo)
+    if (gasto.facturaPdf) await gastosApi.subirFactura(id, gasto.facturaPdf)
+    if (gasto.facturaXml) await gastosApi.subirFacturaXml(id, gasto.facturaXml)
+
+    await recargarGastos()
   }
 
-  function eliminarBorrador(id) {
-    setBorradores(prev => prev.filter(b => b.id !== id))
+  async function eliminarBorrador(id) {
+    await gastosApi.eliminar(id)
+    await recargarGastos()
   }
 
-  function actualizarCategoria(id, cambios) {
-    setCategorias(prev => prev.map(c => c.id === id ? { ...c, ...cambios } : c))
+  async function actualizarCategoria(id, cambios) {
+    await categoriasApi.actualizar(id, {
+      nombre: cambios.nombre,
+      descripcion: cambios.descripcion,
+      color: cambios.color,
+      icono: cambios.icono,
+      estado: cambios.activo === undefined ? undefined : cambios.activo ? 'activo' : 'inactivo',
+    })
+    await recargarCategorias()
   }
 
-  function crearCategoria(data) {
-    setCategorias(prev => [...prev, { ...data, id: Date.now(), activo: true }])
+  async function crearCategoria(data) {
+    await categoriasApi.crear({
+      nombre: data.nombre,
+      descripcion: data.descripcion,
+      color: data.color,
+      icono: data.icono,
+    })
+    await recargarCategorias()
   }
 
-  function agregarUsuario(data) {
-    setUsuariosList(prev => [...prev, { ...data, id: Date.now() }])
+  // El backend borra en firme si la categoria no tiene gastos asociados, o
+  // la desactiva si si los tiene (rompería la FK gastos.categoria_id). El
+  // mensaje de respuesta le dice a la pantalla cual de los dos paso.
+  async function eliminarCategoria(id) {
+    const { mensaje } = await categoriasApi.eliminar(id)
+    await recargarCategorias()
+    return mensaje
   }
 
-  function eliminarUsuario(id) {
-    setUsuariosList(prev => prev.filter(u => u.id !== id))
+  // El backend genera la contrasena temporal y se la manda por correo
+  // directo al usuario nuevo: el admin nunca la recibe ni la ve (protege al
+  // operador). Aqui solo regresa los datos basicos del usuario creado.
+  async function agregarUsuario(data) {
+    const creado = await usuariosApi.crear({
+      nombre: data.nombre,
+      email: data.email,
+      rol: data.rol,
+      num_empleado: data.num_empleado,
+    })
+    await recargarUsuarios()
+    return creado
+  }
+
+  async function eliminarUsuario(id) {
+    await usuariosApi.eliminar(id)
+    await recargarUsuarios()
+  }
+
+  async function marcarNotificacionLeida(id) {
+    setNotificaciones(prev => prev.map(n => n.id === id ? { ...n, leido: true } : n))
+    try {
+      await notificacionesApi.marcarLeida(id)
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }
+
+  async function marcarTodasNotificacionesLeidas() {
+    setNotificaciones(prev => prev.map(n => ({ ...n, leido: true })))
+    try {
+      await notificacionesApi.marcarTodasLeidas()
+    } catch (err) {
+      toast.error(err.message)
+    }
   }
 
   return (
     <DataContext.Provider value={{
-      viajes, gastos, categorias, usuariosList, borradores,
-      crearViaje, agregarGasto, aprobarGasto, rechazarGasto, revertirGasto,
+      viajes, gastos, categorias, usuariosList, borradores, notificaciones,
+      crearViaje, actualizarViaje, agregarGasto, actualizarGasto, aprobarGasto, rechazarGasto,
       gastosDeViaje, viajesActivosDeUsuario,
-      saveDraft, eliminarBorrador,
-      actualizarCategoria, crearCategoria,
+      eliminarBorrador,
+      actualizarCategoria, crearCategoria, eliminarCategoria,
       agregarUsuario, eliminarUsuario,
+      marcarNotificacionLeida, marcarTodasNotificacionesLeidas,
     }}>
       {children}
     </DataContext.Provider>

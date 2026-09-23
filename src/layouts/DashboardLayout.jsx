@@ -6,24 +6,27 @@ import {
   BarChart2, Tag, Menu, X, Plane, BookMarked
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useData } from '../context/DataContext'
 import IconButton from '../components/IconButton'
 
+// Orden pensado por frecuencia de uso real: lo que se hace a diario arriba,
+// lo que se configura una vez y ya casi no se toca, abajo.
 const operadorNav = [
   { to: '/operador/dashboard', icon: LayoutDashboard, label: 'Inicio' },
   { to: '/operador/nuevo-gasto', icon: PlusSquare, label: 'Nuevo Gasto' },
   { to: '/operador/historial', icon: History, label: 'Historial' },
-  { to: '/operador/borradores', icon: BookMarked, label: 'Borradores' },
   { to: '/operador/notificaciones', icon: Bell, label: 'Notificaciones' },
+  { to: '/operador/borradores', icon: BookMarked, label: 'Borradores' },
 ]
 
 const adminNav = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Inicio' },
-  { to: '/admin/viajes', icon: Plane, label: 'Viajes' },
   { to: '/admin/todos-gastos', icon: List, label: 'Todos los Gastos' },
+  { to: '/admin/viajes', icon: Plane, label: 'Viajes' },
   { to: '/admin/reportes', icon: BarChart2, label: 'Reportes' },
+  { to: '/admin/notificaciones', icon: Bell, label: 'Notificaciones' },
   { to: '/admin/categorias', icon: Tag, label: 'Categorías' },
   { to: '/admin/usuarios', icon: Users, label: 'Usuarios' },
-  { to: '/admin/notificaciones', icon: Bell, label: 'Notificaciones' },
 ]
 
 function LogoutModal({ onConfirm, onCancel }) {
@@ -35,7 +38,7 @@ function LogoutModal({ onConfirm, onCancel }) {
           <LogOut size={22} className="text-red-600" />
         </div>
         <h3 className="text-base font-bold text-gray-900 text-center mb-1">¿Cerrar sesión?</h3>
-        <p className="text-sm text-gray-500 text-center mb-6">Se cerrará tu sesión actual. Tendrás que volver a iniciar sesión para acceder.</p>
+        <p className="text-sm text-gray-700 text-center mb-6">Se cerrará tu sesión actual. Tendrás que volver a iniciar sesión para acceder.</p>
         <div className="flex flex-col gap-2">
           <button onClick={onConfirm} className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
             Sí, cerrar sesión
@@ -49,7 +52,7 @@ function LogoutModal({ onConfirm, onCancel }) {
   )
 }
 
-function SidebarContent({ navItems, onNavigate, onLogout, user, avatar }) {
+function SidebarContent({ navItems, onNavigate, onLogout, user, avatar, noLeidas }) {
   return (
     <>
       <div className="px-4 py-5 border-b border-white/10">
@@ -98,6 +101,11 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar }) {
           >
             <Icon size={18} />
             {label}
+            {label === 'Notificaciones' && noLeidas > 0 && (
+              <span className="ml-auto bg-blue-500 text-white text-sm font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                {noLeidas}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
@@ -105,7 +113,7 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar }) {
       <div className="px-3 pb-4">
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-red-300 hover:bg-red-500/20 hover:text-red-200 active:bg-red-500/30 transition-colors w-full font-medium"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-red-200 bg-red-500/20 w-full font-medium"
         >
           <LogOut size={18} />
           Cerrar sesión
@@ -118,12 +126,14 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar }) {
 export default function DashboardLayout({ role }) {
   const navigate = useNavigate()
   const { user, logout, avatar } = useAuth()
+  const { notificaciones } = useData()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [logoutModal, setLogoutModal] = useState(false)
   const navItems = role === 'admin' ? adminNav : operadorNav
+  const noLeidas = notificaciones.filter(n => !n.leido).length
 
-  function handleLogout() {
-    logout()
+  async function handleLogout() {
+    await logout()
     navigate('/login')
   }
 
@@ -133,7 +143,7 @@ export default function DashboardLayout({ role }) {
 
       {/* Sidebar desktop */}
       <aside className="hidden md:flex w-60 bg-[#1a2456] flex-col flex-shrink-0">
-        <SidebarContent navItems={navItems} onLogout={() => setLogoutModal(true)} user={user} avatar={avatar} />
+        <SidebarContent navItems={navItems} onLogout={() => setLogoutModal(true)} user={user} avatar={avatar} noLeidas={noLeidas} />
       </aside>
 
       {/* Overlay mobile */}
@@ -144,7 +154,7 @@ export default function DashboardLayout({ role }) {
       {/* Sidebar mobile drawer */}
       <aside className={`fixed top-0 left-0 h-full w-72 bg-[#1a2456] flex flex-col z-40 transition-transform duration-300 md:hidden ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <IconButton icon={X} label="Cerrar menú" onClick={() => setMobileOpen(false)} variant="ghostOnDark" iconSize={22} className="absolute top-3 right-3" />
-        <SidebarContent navItems={navItems} onLogout={() => { setMobileOpen(false); setLogoutModal(true) }} user={user} avatar={avatar} onNavigate={() => setMobileOpen(false)} />
+        <SidebarContent navItems={navItems} onLogout={() => { setMobileOpen(false); setLogoutModal(true) }} user={user} avatar={avatar} noLeidas={noLeidas} onNavigate={() => setMobileOpen(false)} />
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">

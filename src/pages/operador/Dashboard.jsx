@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
-import { Clock, CheckCircle, XCircle, Plus, ChevronRight, Plane, TrendingUp, FileText, BookMarked } from 'lucide-react'
+import { Clock, CheckCircle, XCircle, Plus, ChevronRight, Plane, TrendingUp, FileText, BookMarked, History } from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import { useAuth } from '../../context/AuthContext'
 import { formatDateRange, formatDate } from '../../utils/date'
+import { gastadoDeViaje } from '../../utils/presupuesto'
+import PresupuestoBar from '../../components/PresupuestoBar'
 
 const estadoBadge = {
   Aprobado: 'text-green-700 bg-green-100',
@@ -15,7 +17,7 @@ const estadoColor = { Aprobado: '#22c55e', Pendiente: '#f59e0b', Rechazado: '#ef
 export default function DashboardOperador() {
   const { user } = useAuth()
   const { gastos, viajes, borradores } = useData()
-  const usuarioId = 1
+  const usuarioId = user?.id
 
   const misGastos = gastos.filter(g => g.usuario_id === usuarioId)
   const misViajes = viajes.filter(v => v.usuario_id === usuarioId)
@@ -29,8 +31,7 @@ export default function DashboardOperador() {
   const recientes = [...misGastos].slice(0, 4)
 
   const gastosDeViajeActivo = viajeActivo ? misGastos.filter(g => g.viaje_id === viajeActivo.id) : []
-  const totalViaje = gastosDeViajeActivo.reduce((s, g) => s + g.monto, 0)
-  const pctPresupuesto = viajeActivo?.presupuesto ? Math.min(100, Math.round((totalViaje / viajeActivo.presupuesto) * 100)) : 0
+  const gastadoViaje = gastadoDeViaje(gastosDeViajeActivo)
 
   return (
     <div className="p-4 sm:p-5 space-y-4">
@@ -39,7 +40,7 @@ export default function DashboardOperador() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-900">¡Hola, {user?.nombre?.split(' ')[0] ?? 'Carlos'}! 👋</h1>
-          <p className="text-sm text-gray-500">Aquí está el resumen de tus gastos</p>
+          <p className="text-sm text-gray-700">Aquí está el resumen de tus gastos</p>
         </div>
         <Link to="/operador/nuevo-gasto"
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-sm shadow-md shadow-blue-200 transition-colors flex-shrink-0">
@@ -66,19 +67,7 @@ export default function DashboardOperador() {
             <span>📅 {formatDateRange(viajeActivo.fecha_inicio, viajeActivo.fecha_fin)}</span>
             <span>{gastosDeViajeActivo.length} gastos registrados</span>
           </div>
-          {viajeActivo.presupuesto > 0 && (
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-blue-200">Presupuesto utilizado</span>
-                <span className="text-white font-bold">${totalViaje.toLocaleString()} / ${viajeActivo.presupuesto.toLocaleString()}</span>
-              </div>
-              <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                <div className={`h-full rounded-full transition-all ${pctPresupuesto >= 90 ? 'bg-red-400' : pctPresupuesto >= 70 ? 'bg-yellow-400' : 'bg-green-400'}`}
-                  style={{ width: `${pctPresupuesto}%` }} />
-              </div>
-              <p className={`text-sm mt-1 font-semibold ${pctPresupuesto >= 90 ? 'text-red-300' : 'text-blue-200'}`}>{pctPresupuesto}% utilizado</p>
-            </div>
-          )}
+          <PresupuestoBar gastado={gastadoViaje} presupuesto={viajeActivo.presupuesto} variant="dark" />
         </div>
       ) : (
         <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 flex items-center gap-3">
@@ -98,12 +87,12 @@ export default function DashboardOperador() {
           { icon: XCircle, bg: 'bg-red-100', color: 'text-red-600', label: 'Rechazados', value: rechazados, sub: 'Revisa el motivo' },
           { icon: FileText, bg: 'bg-blue-100', color: 'text-blue-600', label: 'Total gastos', value: misGastos.length, sub: `${misViajes.length} viaje${misViajes.length !== 1 ? 's' : ''}` },
         ].map(({ icon: Icon, bg, color, label, value, sub }) => (
-          <div key={label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex sm:flex-row flex-col sm:items-center gap-3">
+          <div key={label} className="bg-white rounded-2xl border border-black shadow-sm p-4 flex sm:flex-row flex-col sm:items-center gap-3">
             <div className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
               <Icon size={18} className={color} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-500">{label}</p>
+              <p className="text-sm font-semibold text-gray-700">{label}</p>
               <p className="text-2xl font-black text-gray-900 leading-tight">{value}</p>
               <p className="text-sm text-gray-600">{sub}</p>
             </div>
@@ -111,15 +100,17 @@ export default function DashboardOperador() {
         ))}
       </div>
 
-      {/* Accesos rápidos */}
+      {/* Accesos rápidos — "Nuevo gasto" ya está arriba en el header y en el
+          sidebar, así que aquí solo van rutas que no tienen otro acceso
+          directo (evita un tercer botón redundante hacia el mismo lugar). */}
       <div className="grid grid-cols-2 gap-3">
-        <Link to="/operador/nuevo-gasto" className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-2xl p-4 flex items-center gap-3 transition-colors">
-          <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Plus size={18} className="text-white" />
+        <Link to="/operador/historial" className="bg-white hover:bg-gray-50 active:bg-gray-100 border border-black shadow-sm rounded-2xl p-4 flex items-center gap-3 transition-colors">
+          <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <History size={18} className="text-blue-600" />
           </div>
-          <span className="text-white font-bold text-sm">Nuevo gasto</span>
+          <span className="text-gray-800 font-bold text-sm">Historial</span>
         </Link>
-        <Link to="/operador/borradores" className="bg-white hover:bg-gray-50 active:bg-gray-100 border border-gray-100 shadow-sm rounded-2xl p-4 flex items-center gap-3 transition-colors">
+        <Link to="/operador/borradores" className="bg-white hover:bg-gray-50 active:bg-gray-100 border border-black shadow-sm rounded-2xl p-4 flex items-center gap-3 transition-colors">
           <div className="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <BookMarked size={18} className="text-orange-600" />
           </div>
@@ -131,7 +122,7 @@ export default function DashboardOperador() {
       </div>
 
       {/* Últimos gastos */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-black shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
           <p className="font-bold text-gray-900 text-sm">Últimos gastos</p>
           <Link to="/operador/historial" className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700">
@@ -161,7 +152,7 @@ export default function DashboardOperador() {
 
       {/* Distribución mini */}
       {misGastos.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <div className="bg-white rounded-2xl border border-black shadow-sm p-4">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp size={16} className="text-blue-600" />
             <p className="font-bold text-gray-900 text-sm">Distribución de mis gastos</p>

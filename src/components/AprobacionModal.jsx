@@ -1,17 +1,33 @@
 import { useState } from 'react'
-import { X, ChevronLeft, ChevronRight, Check, XCircle, ImageOff, MapPin, Calendar, Tag, DollarSign } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Check, XCircle, ImageOff, MapPin, Calendar, Tag, DollarSign, FileText } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useData } from '../context/DataContext'
 import IconButton from './IconButton'
+import ComprobanteImage from './ComprobanteImage'
+import ConfirmModal from './ConfirmModal'
+import { getFacturaBlobUrl, getFacturaXmlBlobUrl } from '../api/client'
 import { formatDate } from '../utils/date'
 
+// Motivos mas comunes al rechazar un gasto: un clic los pone en el
+// comentario (sigue siendo editable/ampliable a mano despues).
+const MOTIVOS_RECHAZO = [
+  'Comprobante ilegible',
+  'Monto no coincide con el comprobante',
+  'Gasto fuera de politica',
+  'Falta el comprobante',
+  'Categoria incorrecta',
+  'Gasto duplicado',
+]
+
 export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
-  const { gastosDeViaje, aprobarGasto, rechazarGasto, revertirGasto } = useData()
+  const { gastosDeViaje, aprobarGasto, rechazarGasto } = useData()
   const pendientes = gastosDeViaje(viaje.id).filter(g => g.estado === 'Pendiente')
 
   const [idx, setIdx] = useState(Math.min(initialIdx, Math.max(0, pendientes.length - 1)))
   const [comentario, setComentario] = useState('')
   const [rechazando, setRechazando] = useState(false)
+  const [confirmandoAprobar, setConfirmandoAprobar] = useState(false)
+  const [enviando, setEnviando] = useState(false)
 
   const gasto = pendientes[idx]
   const total = pendientes.length
@@ -29,45 +45,56 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
     )
   }
 
-  function undoToast(id, mensaje) {
-    toast((t) => (
-      <div className="flex items-center gap-3">
-        <span>{mensaje}</span>
-        <button
-          onClick={() => { revertirGasto(id); toast.dismiss(t.id) }}
-          className="text-sm font-bold text-blue-600 hover:underline flex-shrink-0"
-        >
-          Deshacer
-        </button>
-      </div>
-    ), { duration: 5000 })
+  async function handleAprobar() {
+    setConfirmandoAprobar(false)
+    setEnviando(true)
+    try {
+      await aprobarGasto(gasto.id)
+      toast.success(`Gasto de $${gasto.monto} aprobado`)
+      setComentario('')
+      setRechazando(false)
+      if (idx >= total - 1) onClose()
+      else setIdx(i => Math.min(i, total - 2))
+    } catch (err) {
+      toast.error(err.message)
+    } finally {
+      setEnviando(false)
+    }
   }
 
-  function handleAprobar() {
-    aprobarGasto(gasto.id)
-    undoToast(gasto.id, `Gasto de $${gasto.monto} aprobado`)
-    setComentario('')
-    setRechazando(false)
-    if (idx >= total - 1) onClose()
-    else setIdx(i => Math.min(i, total - 2))
-  }
-
-  function handleRechazar() {
+  async function handleRechazar() {
     if (!comentario.trim()) {
       toast.error('Escribe el motivo del rechazo')
       return
     }
-    rechazarGasto(gasto.id, comentario)
-    undoToast(gasto.id, 'Gasto rechazado')
-    setComentario('')
-    setRechazando(false)
-    if (idx >= total - 1) onClose()
-    else setIdx(i => Math.min(i, total - 2))
+    setEnviando(true)
+    try {
+      await rechazarGasto(gasto.id, comentario)
+      toast.success('Gasto rechazado')
+      setComentario('')
+      setRechazando(false)
+      if (idx >= total - 1) onClose()
+      else setIdx(i => Math.min(i, total - 2))
+    } catch (err) {
+      toast.error(err.message)
+    } finally {
+      setEnviando(false)
+    }
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+
+      <ConfirmModal
+        open={confirmandoAprobar}
+        title="¿Aprobar este gasto?"
+        message={`Se aprobará el gasto de $${gasto.monto?.toFixed(2)} y el empleado recibirá una notificación. Esta acción no se puede deshacer.`}
+        confirmLabel="Sí, aprobar"
+        confirmClass="bg-green-600 hover:bg-green-700"
+        onConfirm={handleAprobar}
+        onCancel={() => setConfirmandoAprobar(false)}
+      />
 
       <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl z-10 flex flex-col overflow-hidden" style={{ maxHeight: '92vh' }}>
 
@@ -90,10 +117,10 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
 
           {/* LEFT — comprobante */}
           <div className="sm:w-1/2 bg-gray-900 flex flex-col items-center justify-center p-4 min-h-48 sm:min-h-0 relative">
-            {gasto.preview ? (
-              <img src={gasto.preview} alt="comprobante" className="max-h-full max-w-full object-contain rounded-lg" />
+            {gasto.foto_url ? (
+              <ComprobanteImage gastoId={gasto.id} className="max-h-full max-w-full object-contain rounded-lg" emptyLabel="No se pudo cargar el comprobante" />
             ) : (
-              <div className="flex flex-col items-center gap-3 text-gray-500">
+              <div className="flex flex-col items-center gap-3 text-gray-700">
                 <ImageOff size={40} className="opacity-40" />
                 <p className="text-sm text-center opacity-60">Sin comprobante adjunto</p>
               </div>
@@ -122,10 +149,48 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
               <div>
                 <p className="text-sm text-gray-600 uppercase tracking-wide mb-3">Datos del gasto</p>
                 <DataRow icon={<DollarSign size={14} />} label="Monto" value={<span className="text-lg font-bold text-gray-900">${gasto.monto.toFixed(2)}</span>} />
+                {gasto.iva > 0 && <DataRow icon={<DollarSign size={14} />} label="IVA" value={`$${gasto.iva.toFixed(2)}`} />}
                 <DataRow icon={<Tag size={14} />} label="Categoría" value={gasto.categoria} />
                 <DataRow icon={<Calendar size={14} />} label="Fecha" value={formatDate(gasto.fecha)} />
                 {gasto.ubicacion && <DataRow icon={<MapPin size={14} />} label="Ubicación" value={gasto.ubicacion} />}
               </div>
+
+              {(gasto.factura_url || gasto.factura_xml_url) && (
+                <div className="flex flex-wrap gap-3">
+                  {gasto.factura_url && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const url = await getFacturaBlobUrl(gasto.id)
+                          window.open(url, '_blank', 'noopener')
+                        } catch (err) {
+                          toast.error(err.message)
+                        }
+                      }}
+                      className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-fit"
+                    >
+                      <FileText size={14} /> Ver factura (PDF)
+                    </button>
+                  )}
+                  {gasto.factura_xml_url && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const url = await getFacturaXmlBlobUrl(gasto.id)
+                          window.open(url, '_blank', 'noopener')
+                        } catch (err) {
+                          toast.error(err.message)
+                        }
+                      }}
+                      className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-fit"
+                    >
+                      <FileText size={14} /> Ver factura (XML)
+                    </button>
+                  )}
+                </div>
+              )}
 
               {gasto.descripcion && (
                 <div>
@@ -142,7 +207,19 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
               {/* Comentario rechazo */}
               {rechazando && (
                 <div>
-                  <label className="text-sm text-gray-500 mb-1 block">Motivo del rechazo <span className="text-red-500">*</span></label>
+                  <label className="text-sm text-gray-600 mb-1.5 block">Motivo del rechazo <span className="text-red-500">*</span></label>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {MOTIVOS_RECHAZO.map(motivo => (
+                      <button
+                        key={motivo}
+                        type="button"
+                        onClick={() => setComentario(c => c ? `${c}${c.endsWith('.') ? '' : '.'} ${motivo}` : motivo)}
+                        className="text-sm bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-700 border border-red-200 px-2.5 py-1 rounded-full transition-colors"
+                      >
+                        {motivo}
+                      </button>
+                    ))}
+                  </div>
                   <textarea
                     autoFocus
                     value={comentario}
@@ -160,14 +237,16 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
               {!rechazando ? (
                 <div className="flex gap-2">
                   <button
-                    onClick={handleAprobar}
-                    className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
+                    onClick={() => setConfirmandoAprobar(true)}
+                    disabled={enviando}
+                    className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
                   >
                     <Check size={16} /> Aprobar
                   </button>
                   <button
                     onClick={() => setRechazando(true)}
-                    className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
+                    disabled={enviando}
+                    className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
                   >
                     <XCircle size={16} /> Rechazar
                   </button>
@@ -176,13 +255,15 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
                 <div className="flex gap-2">
                   <button
                     onClick={() => { setRechazando(false); setComentario('') }}
-                    className="flex-1 border border-gray-300 text-gray-700 font-medium py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors"
+                    disabled={enviando}
+                    className="flex-1 border border-gray-300 text-gray-700 font-medium py-2.5 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleRechazar}
-                    className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
+                    disabled={enviando}
+                    className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
                   >
                     <XCircle size={16} /> Confirmar rechazo
                   </button>

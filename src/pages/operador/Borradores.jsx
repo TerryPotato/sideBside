@@ -1,23 +1,31 @@
 import { useState } from 'react'
-import { Trash2, Send, BookMarked, AlertCircle } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Trash2, Pencil, BookMarked, AlertCircle } from 'lucide-react'
 import { useData } from '../../context/DataContext'
+import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
 import ConfirmModal from '../../components/ConfirmModal'
-import { formatDate } from '../../utils/date'
+import { formatDate, formatDateTime } from '../../utils/date'
 
 export default function Borradores() {
   const { borradores, eliminarBorrador } = useData()
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [confirmId, setConfirmId] = useState(null)
 
-  function handleEliminar() {
-    eliminarBorrador(confirmId)
-    setConfirmId(null)
-    toast('Borrador eliminado', { icon: '🗑️' })
+  async function handleEliminar() {
+    try {
+      await eliminarBorrador(confirmId)
+      toast('Borrador eliminado', { icon: '🗑️' })
+    } catch (err) {
+      toast.error(err.message)
+    } finally {
+      setConfirmId(null)
+    }
   }
 
   function formatFecha(iso) {
-    const d = new Date(iso)
-    return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+    return formatDateTime(iso, user?.zona_horaria)
   }
 
   return (
@@ -28,9 +36,10 @@ export default function Borradores() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900">Borradores</h1>
-          <p className="text-sm text-gray-500">{borradores.length} borrador{borradores.length !== 1 ? 'es' : ''} guardado{borradores.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-gray-700">{borradores.length} borrador{borradores.length !== 1 ? 'es' : ''} guardado{borradores.length !== 1 ? 's' : ''}</p>
         </div>
       </div>
+      <p className="text-sm text-gray-700 -mt-2 mb-5">Un borrador no se envía a revisión hasta que le das clic a "Continuar editando" y lo completas. También puedes eliminarlo si ya no lo necesitas.</p>
 
       <ConfirmModal
         open={!!confirmId}
@@ -43,7 +52,7 @@ export default function Borradores() {
       />
 
       {borradores.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col items-center text-center gap-3">
+        <div className="bg-white rounded-2xl border border-black shadow-sm p-8 flex flex-col items-center text-center gap-3">
           <BookMarked size={40} className="text-gray-300" />
           <p className="text-base font-semibold text-gray-700">No tienes borradores guardados</p>
           <p className="text-sm text-gray-600">Cuando guardes un gasto como borrador aparecerá aquí.</p>
@@ -51,7 +60,7 @@ export default function Borradores() {
       ) : (
         <div className="space-y-3">
           {borradores.map(b => (
-            <div key={b.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            <div key={b.id} className="bg-white rounded-2xl border border-black shadow-sm p-4">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -66,9 +75,9 @@ export default function Borradores() {
                   <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
                     {b.fecha && <span>📅 {formatDate(b.fecha)}</span>}
                     {b.ubicacion && <span>📍 {b.ubicacion}</span>}
-                    <span>💾 Guardado: {formatFecha(b.guardado_en)}</span>
+                    <span>💾 Guardado: {formatFecha(b.fecha_creacion)}</span>
                   </div>
-                  {(!b.recibo && !b.factura) && (
+                  {!b.foto_url && !b.factura_url && !b.factura_xml_url && (
                     <div className="flex items-center gap-1 mt-2 text-sm text-yellow-600 bg-yellow-50 px-2 py-1 rounded-lg w-fit">
                       <AlertCircle size={12} /> Sin documentos adjuntos
                     </div>
@@ -77,10 +86,10 @@ export default function Borradores() {
               </div>
               <div className="flex gap-2 pt-2 border-t border-gray-100">
                 <button
-                  onClick={() => toast('Próximamente: continuar desde borrador', { icon: '🚧' })}
+                  onClick={() => navigate(`/operador/nuevo-gasto/${b.id}`)}
                   className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
                 >
-                  <Send size={15} /> Continuar y enviar
+                  <Pencil size={15} /> Continuar editando
                 </button>
                 <button
                   onClick={() => setConfirmId(b.id)}

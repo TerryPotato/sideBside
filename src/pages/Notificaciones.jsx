@@ -1,22 +1,7 @@
-import { useState } from 'react'
 import { CheckCircle, XCircle, Clock, Bell, Plane } from 'lucide-react'
+import { useData } from '../context/DataContext'
 import { useAuth } from '../context/AuthContext'
-
-const notisOperador = [
-  { tipo: 'aprobado', titulo: 'Gasto aprobado — $350.00', detalle: 'Comida con cliente · 14/05/2024', hora: 'Hace 5 min', hoy: true, leido: false },
-  { tipo: 'rechazado', titulo: 'Gasto rechazado — $120.00', detalle: 'Café reunión · Motivo: ticket ilegible', hora: 'Hace 2 h', hoy: true, leido: false },
-  { tipo: 'viaje', titulo: 'Nuevo viaje asignado', detalle: 'Visita cliente Monterrey · 10/05 → 15/05', hora: 'Hace 3 h', hoy: true, leido: false },
-  { tipo: 'aprobado', titulo: 'Gasto aprobado — $800.00', detalle: 'Gasolina autopista Mty · 13/05/2024', hora: 'Ayer 09:10', hoy: false, leido: true },
-  { tipo: 'pendiente', titulo: '2 gastos sin revisión', detalle: 'Consulta el historial de tu viaje', hora: 'Hace 2 días', hoy: false, leido: true },
-]
-
-const notisAdmin = [
-  { tipo: 'pendiente', titulo: 'Nuevo gasto de Carlos López', detalle: 'Gasolina · $800.00 · Viaje Monterrey', hora: 'Hace 5 min', hoy: true, leido: false },
-  { tipo: 'pendiente', titulo: 'Nuevo gasto de María García', detalle: 'Almuerzo · $280.00 · Feria CDMX', hora: 'Hace 20 min', hoy: true, leido: false },
-  { tipo: 'viaje', titulo: 'Viaje "Feria CDMX" termina hoy', detalle: 'María García · 2 gastos pendientes', hora: 'Hace 1 h', hoy: true, leido: false },
-  { tipo: 'info', titulo: '5 gastos esperan aprobación', detalle: 'En 2 viajes activos', hora: 'Ayer 08:00', hoy: false, leido: true },
-  { tipo: 'aprobado', titulo: 'Aprobaste gasto de $350.00', detalle: 'Carlos López · Comida con cliente', hora: 'Hace 2 días', hoy: false, leido: true },
-]
+import { formatDateTime } from '../utils/date'
 
 const config = {
   aprobado: { icon: CheckCircle, bg: 'bg-green-100', text: 'text-green-600', label: 'Aprobado' },
@@ -26,23 +11,23 @@ const config = {
   viaje: { icon: Plane, bg: 'bg-indigo-100', text: 'text-indigo-600', label: 'Viaje' },
 }
 
+function esHoy(iso) {
+  return new Date(iso).toDateString() === new Date().toDateString()
+}
+
 export default function Notificaciones() {
+  const { notificaciones, marcarNotificacionLeida, marcarTodasNotificacionesLeidas } = useData()
   const { user } = useAuth()
-  const lista = user?.rol === 'admin' ? notisAdmin : notisOperador
-  const [notis, setNotis] = useState(lista)
 
-  const hoy = notis.filter(n => n.hoy)
-  const anteriores = notis.filter(n => !n.hoy)
-  const noLeidas = notis.filter(n => !n.leido).length
+  const hoy = notificaciones.filter(n => esHoy(n.fecha_creacion))
+  const anteriores = notificaciones.filter(n => !esHoy(n.fecha_creacion))
+  const noLeidas = notificaciones.filter(n => !n.leido).length
 
-  function marcar(i) { setNotis(prev => prev.map((n, j) => j === i ? { ...n, leido: true } : n)) }
-  function marcarTodas() { setNotis(prev => prev.map(n => ({ ...n, leido: true }))) }
-
-  function Item({ n, i }) {
+  function Item({ n }) {
     const { icon: Icono, bg, text } = config[n.tipo] ?? config.info
     return (
       <div
-        onClick={() => marcar(i)}
+        onClick={() => marcarNotificacionLeida(n.id)}
         className={`flex items-start gap-3 p-3.5 rounded-2xl cursor-pointer border transition-all active:scale-[0.99] ${
           !n.leido
             ? 'bg-white border-blue-200 shadow-sm shadow-blue-100'
@@ -54,8 +39,10 @@ export default function Notificaciones() {
         </div>
         <div className="flex-1 min-w-0">
           <p className={`text-sm leading-snug ${!n.leido ? 'font-bold text-gray-900' : 'font-medium text-gray-600'}`}>{n.titulo}</p>
-          <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">{n.detalle}</p>
-          <p className="text-xs text-gray-600 mt-1.5 font-medium">{n.hora}</p>
+          {n.detalle && <p className="text-sm text-gray-700 mt-0.5 leading-relaxed">{n.detalle}</p>}
+          <p className="text-xs text-gray-600 mt-1.5 font-medium">
+            {formatDateTime(n.fecha_creacion, user?.zona_horaria)}
+          </p>
         </div>
         {!n.leido && <span className="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0 mt-1.5" />}
       </div>
@@ -71,18 +58,20 @@ export default function Notificaciones() {
           {noLeidas > 0 && <span className="bg-blue-500 text-white text-sm font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">{noLeidas}</span>}
         </div>
         {noLeidas > 0 && (
-          <button onClick={marcarTodas} className="text-sm font-semibold text-blue-600 hover:text-blue-700 active:text-blue-800 py-1.5 px-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+          <button onClick={marcarTodasNotificacionesLeidas} className="text-sm font-semibold text-blue-600 hover:text-blue-700 active:text-blue-800 py-1.5 px-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
             Marcar todas
           </button>
         )}
       </div>
 
       <div className="p-4 space-y-5">
+        <p className="text-sm text-gray-700 -mt-1">Aquí ves los avisos de gastos, viajes y aprobaciones. Da clic en una para marcarla como leída.</p>
+
         {/* Hoy */}
         {hoy.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-bold text-gray-600 uppercase tracking-widest px-1">Hoy</p>
-            {hoy.map((n, i) => <Item key={i} n={n} i={i} />)}
+            {hoy.map(n => <Item key={n.id} n={n} />)}
           </div>
         )}
 
@@ -90,11 +79,11 @@ export default function Notificaciones() {
         {anteriores.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-bold text-gray-600 uppercase tracking-widest px-1">Anteriores</p>
-            {anteriores.map((n, i) => <Item key={i + hoy.length} n={n} i={i + hoy.length} />)}
+            {anteriores.map(n => <Item key={n.id} n={n} />)}
           </div>
         )}
 
-        {notis.length === 0 && (
+        {notificaciones.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-gray-600">
             <Bell size={40} className="mb-3 opacity-30" />
             <p className="text-sm">Sin notificaciones</p>

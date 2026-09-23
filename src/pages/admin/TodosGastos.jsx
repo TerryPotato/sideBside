@@ -1,11 +1,15 @@
-import { useState, useMemo } from 'react'
-import { Eye, FileSpreadsheet, FileText, ChevronLeft, ChevronRight, X, MapPin, Calendar, Tag, DollarSign, ImageOff, ClipboardCheck } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { Eye, FileSpreadsheet, FileText, ChevronLeft, ChevronRight, X, MapPin, Calendar, Tag, DollarSign, ImageOff, ClipboardCheck, Search, Loader2 } from 'lucide-react'
 import EmptyState from '../../components/EmptyState'
 import AprobacionModal from '../../components/AprobacionModal'
 import IconButton from '../../components/IconButton'
+import ComprobanteImage from '../../components/ComprobanteImage'
 import toast from 'react-hot-toast'
 import { useData } from '../../context/DataContext'
 import { formatDate } from '../../utils/date'
+import { exportExcel, exportPDF, todayStamp } from '../../utils/export'
+import * as gastosApi from '../../api/gastos'
+import { getFacturaBlobUrl, getFacturaXmlBlobUrl } from '../../api/client'
 
 const estadoBadge = {
   Aprobado: 'text-green-700 bg-green-100',
@@ -21,7 +25,23 @@ const estadoFila = {
 
 const POR_PAGINA = 8
 
-function DetalleModal({ gasto, viaje, onClose }) {
+// El listado (useData/gastos) solo trae los campos basicos para pintar la
+// tabla. Al abrir el detalle se pide el registro especifico al backend
+// (incluye el motivo de rechazo, que vive en otra tabla y no tiene caso
+// cargar para cada fila del listado general).
+function DetalleModal({ gastoBasico, viaje, onClose }) {
+  const [gasto, setGasto] = useState(gastoBasico)
+  const [cargando, setCargando] = useState(true)
+
+  useEffect(() => {
+    let cancelado = false
+    gastosApi.obtenerDetalle(gastoBasico.id)
+      .then(detalle => { if (!cancelado) setGasto(g => ({ ...g, ...detalle })) })
+      .catch(() => {})
+      .finally(() => !cancelado && setCargando(false))
+    return () => { cancelado = true }
+  }, [gastoBasico.id])
+
   const estadoBadge = {
     Aprobado: 'text-green-600 bg-green-50',
     Pendiente: 'text-yellow-600 bg-yellow-50',
@@ -30,7 +50,7 @@ function DetalleModal({ gasto, viaje, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg z-10 overflow-hidden">
+      <div className="relative bg-white border border-black rounded-2xl shadow-2xl w-full max-w-lg z-10 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b">
           <h2 className="text-base font-semibold text-gray-800">Detalle del gasto</h2>
@@ -39,10 +59,10 @@ function DetalleModal({ gasto, viaje, onClose }) {
 
         {/* Comprobante */}
         <div className="bg-gray-900 flex items-center justify-center h-48">
-          {gasto.preview ? (
-            <img src={gasto.preview} alt="comprobante" className="max-h-full max-w-full object-contain" />
+          {gasto.foto_url ? (
+            <ComprobanteImage gastoId={gasto.id} />
           ) : (
-            <div className="flex flex-col items-center gap-2 text-gray-500">
+            <div className="flex flex-col items-center gap-2 text-gray-700">
               <ImageOff size={32} className="opacity-40" />
               <p className="text-sm opacity-50">Sin comprobante</p>
             </div>
@@ -57,11 +77,49 @@ function DetalleModal({ gasto, viaje, onClose }) {
           </div>
 
           <div className="grid grid-cols-2 gap-3 text-sm">
+            {gasto.iva > 0 && <Row icon={<DollarSign size={13} />} label="IVA" value={`$${gasto.iva.toFixed(2)}`} />}
             <Row icon={<Tag size={13} />} label="Categoría" value={gasto.categoria} />
             <Row icon={<Calendar size={13} />} label="Fecha" value={formatDate(gasto.fecha)} />
             <Row icon={<DollarSign size={13} />} label="Empleado" value={gasto.empleado} />
             {gasto.ubicacion && <Row icon={<MapPin size={13} />} label="Ubicación" value={gasto.ubicacion} />}
           </div>
+
+          {(gasto.factura_url || gasto.factura_xml_url) && (
+            <div className="flex flex-wrap gap-3">
+              {gasto.factura_url && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const url = await getFacturaBlobUrl(gasto.id)
+                      window.open(url, '_blank', 'noopener')
+                    } catch (err) {
+                      toast.error(err.message)
+                    }
+                  }}
+                  className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-fit"
+                >
+                  <FileText size={14} /> Ver factura (PDF)
+                </button>
+              )}
+              {gasto.factura_xml_url && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const url = await getFacturaXmlBlobUrl(gasto.id)
+                      window.open(url, '_blank', 'noopener')
+                    } catch (err) {
+                      toast.error(err.message)
+                    }
+                  }}
+                  className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-fit"
+                >
+                  <FileText size={14} /> Ver factura (XML)
+                </button>
+              )}
+            </div>
+          )}
 
           {gasto.descripcion && (
             <div>
@@ -77,7 +135,9 @@ function DetalleModal({ gasto, viaje, onClose }) {
             </div>
           )}
 
-          {gasto.comentario && (
+          {cargando ? (
+            <p className="flex items-center gap-2 text-sm text-gray-700"><Loader2 size={14} className="animate-spin" /> Cargando detalle...</p>
+          ) : gasto.comentario && (
             <div>
               <p className="text-sm text-gray-600 mb-1">Motivo de rechazo</p>
               <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{gasto.comentario}</p>
@@ -102,7 +162,7 @@ function Row({ icon, label, value }) {
 }
 
 export default function TodosGastos() {
-  const { gastos, viajes, gastosDeViaje } = useData()
+  const { gastos, viajes, categorias, gastosDeViaje } = useData()
   const [gastoDetalle, setGastoDetalle] = useState(null)
   const [aprobacion, setAprobacion] = useState(null) // { viaje, initialIdx }
 
@@ -114,6 +174,7 @@ export default function TodosGastos() {
     setAprobacion({ viaje, initialIdx: Math.max(0, initialIdx) })
   }
 
+  const [busqueda, setBusqueda] = useState('')
   const [desde, setDesde] = useState('')
   const [hasta, setHasta] = useState('')
   const [categoria, setCategoria] = useState('Todas')
@@ -125,8 +186,10 @@ export default function TodosGastos() {
     if (hasta && g.fecha > hasta) return false
     if (categoria !== 'Todas' && g.categoria !== categoria) return false
     if (estado !== 'Todos' && g.estado !== estado) return false
+    const q = busqueda.trim().toLowerCase()
+    if (q && !g.empleado.toLowerCase().includes(q) && !(g.descripcion ?? '').toLowerCase().includes(q)) return false
     return true
-  }), [gastos, desde, hasta, categoria, estado])
+  }), [gastos, busqueda, desde, hasta, categoria, estado])
 
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA))
   const pagActual = filtrados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA)
@@ -140,11 +203,58 @@ export default function TodosGastos() {
     return viajes.find(v => v.id === viaje_id)?.nombre ?? '—'
   }
 
+  function descargarExcel() {
+    if (filtrados.length === 0) return toast.error('No hay gastos para exportar')
+    exportExcel(`gastos-${todayStamp()}.xlsx`, [{
+      name: 'Gastos',
+      rows: filtrados.map(g => ({
+        Empleado: g.empleado,
+        Viaje: nombreViaje(g.viaje_id),
+        Categoría: g.categoria,
+        Descripción: g.descripcion,
+        Fecha: formatDate(g.fecha),
+        Monto: g.monto,
+        Estado: g.estado,
+      })),
+    }])
+    toast.success('Excel descargado')
+  }
+
+  function descargarPDF() {
+    if (filtrados.length === 0) return toast.error('No hay gastos para exportar')
+    exportPDF({
+      filename: `gastos-${todayStamp()}.pdf`,
+      title: 'Todos los Gastos',
+      subtitle: `generado el ${new Date().toLocaleDateString('es-MX')}`,
+      sections: [{
+        columns: [
+          { header: 'Empleado', key: 'empleado' },
+          { header: 'Viaje', key: 'viaje' },
+          { header: 'Categoría', key: 'categoria' },
+          { header: 'Descripción', key: 'descripcion' },
+          { header: 'Fecha', key: 'fecha' },
+          { header: 'Monto', key: 'monto' },
+          { header: 'Estado', key: 'estado' },
+        ],
+        rows: filtrados.map(g => ({
+          empleado: g.empleado,
+          viaje: nombreViaje(g.viaje_id),
+          categoria: g.categoria,
+          descripcion: g.descripcion,
+          fecha: formatDate(g.fecha),
+          monto: `$${g.monto.toFixed(2)}`,
+          estado: g.estado,
+        })),
+      }],
+    })
+    toast.success('PDF descargado')
+  }
+
   return (
     <div className="p-4 sm:p-6">
       {gastoDetalle && (
         <DetalleModal
-          gasto={gastoDetalle}
+          gastoBasico={gastoDetalle}
           viaje={viajes.find(v => v.id === gastoDetalle.viaje_id)}
           onClose={() => setGastoDetalle(null)}
         />
@@ -156,38 +266,54 @@ export default function TodosGastos() {
           onClose={() => setAprobacion(null)}
         />
       )}
-      <div className="flex items-center justify-between mb-6 gap-2">
-        <h1 className="text-xl font-bold text-gray-800">Todos los Gastos</h1>
-        <div className="flex gap-2">
-          <button onClick={() => toast.success('Descargando Excel...')} aria-label="Descargar Excel" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
+      <div className="flex items-start justify-between mb-6 gap-2">
+        <div>
+          <h1 className="text-xl font-bold text-gray-800">Todos los Gastos</h1>
+          <p className="text-sm text-gray-700 mt-0.5">Filtra y busca los gastos de todo tu equipo. Da clic en el ícono del ojo para ver el detalle completo de un gasto.</p>
+        </div>
+        <div className="flex gap-2 flex-shrink-0">
+          <button onClick={descargarExcel} aria-label="Descargar Excel" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
             <FileSpreadsheet size={14} /><span className="hidden sm:inline">Excel</span>
           </button>
-          <button onClick={() => toast.success('Descargando PDF...')} aria-label="Descargar PDF" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
+          <button onClick={descargarPDF} aria-label="Descargar PDF" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
             <FileText size={14} /><span className="hidden sm:inline">PDF</span>
           </button>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
+      <div className="bg-white rounded-xl border border-black shadow-sm p-4 mb-4">
         <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-1 flex-1 min-w-[200px]">
+            <label className="text-sm text-gray-600">Buscar</label>
+            <div className="relative">
+              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-700" />
+              <input
+                type="text"
+                value={busqueda}
+                onChange={e => { setBusqueda(e.target.value); setPagina(1) }}
+                placeholder="Empleado o descripción..."
+                className="w-full border border-gray-300 rounded pl-7 pr-2 py-1 text-sm"
+              />
+            </div>
+          </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-500">Fecha desde</label>
+            <label className="text-sm text-gray-700">Fecha desde</label>
             <input type="date" value={desde} onChange={e => { setDesde(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-500">Fecha hasta</label>
+            <label className="text-sm text-gray-700">Fecha hasta</label>
             <input type="date" value={hasta} onChange={e => { setHasta(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-500">Categoría</label>
+            <label className="text-sm text-gray-700">Categoría</label>
             <select value={categoria} onChange={e => { setCategoria(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
               <option>Todas</option>
-              {['Comida','Combustible','Peaje','Mantenimiento','Hospedaje','Transporte','Otros'].map(c => <option key={c}>{c}</option>)}
+              {categorias.map(c => <option key={c.id}>{c.nombre}</option>)}
             </select>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-500">Estado</label>
+            <label className="text-sm text-gray-700">Estado</label>
             <select value={estado} onChange={e => { setEstado(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
               <option>Todos</option>
               <option>Aprobado</option>
@@ -198,7 +324,7 @@ export default function TodosGastos() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-4">
+      <div className="bg-white rounded-xl border border-black shadow-sm p-4">
         {filtrados.length === 0 ? (
           <EmptyState message="No hay gastos con esos filtros" />
         ) : (
@@ -222,10 +348,10 @@ export default function TodosGastos() {
                   {pagActual.map((g) => (
                     <tr key={g.id} className={`border-b last:border-0 transition-colors ${estadoFila[g.estado]}`}>
                       <td className="py-2.5 pr-4 text-gray-700 whitespace-nowrap">{g.empleado}</td>
-                      <td className="py-2.5 pr-4 text-gray-500 max-w-[140px] truncate">{nombreViaje(g.viaje_id)}</td>
-                      <td className="py-2.5 pr-4 text-gray-500">{g.categoria}</td>
+                      <td className="py-2.5 pr-4 text-gray-700 max-w-[140px] truncate">{nombreViaje(g.viaje_id)}</td>
+                      <td className="py-2.5 pr-4 text-gray-700">{g.categoria}</td>
                       <td className="py-2.5 pr-4 text-gray-700">{g.descripcion}</td>
-                      <td className="py-2.5 pr-4 text-gray-500 whitespace-nowrap">{formatDate(g.fecha)}</td>
+                      <td className="py-2.5 pr-4 text-gray-700 whitespace-nowrap">{formatDate(g.fecha)}</td>
                       <td className="py-2.5 pr-4 font-medium text-gray-800 whitespace-nowrap">${g.monto.toFixed(2)}</td>
                       <td className="py-2.5 pr-4">
                         <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
@@ -257,7 +383,7 @@ export default function TodosGastos() {
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <div>
                       <p className="text-sm font-medium text-gray-800">{g.empleado}</p>
-                      <p className="text-sm text-gray-500">{g.descripcion} · {g.categoria}</p>
+                      <p className="text-sm text-gray-700">{g.descripcion} · {g.categoria}</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
