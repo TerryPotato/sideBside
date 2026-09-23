@@ -38,12 +38,12 @@ function LogoutModal({ onConfirm, onCancel }) {
           <LogOut size={22} className="text-red-600" />
         </div>
         <h3 className="text-base font-bold text-gray-900 text-center mb-1">¿Cerrar sesión?</h3>
-        <p className="text-sm text-gray-700 text-center mb-6">Se cerrará tu sesión actual. Tendrás que volver a iniciar sesión para acceder.</p>
+        <p className="text-base text-gray-700 text-center mb-6">Se cerrará tu sesión actual. Tendrás que volver a iniciar sesión para acceder.</p>
         <div className="flex flex-col gap-2">
-          <button onClick={onConfirm} className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
+          <button onClick={onConfirm} className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold rounded-xl text-base transition-colors">
             Sí, cerrar sesión
           </button>
-          <button onClick={onCancel} className="w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-colors">
+          <button onClick={onCancel} className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold rounded-xl text-base transition-colors">
             Cancelar
           </button>
         </div>
@@ -57,10 +57,10 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar, noLeidas
     <>
       <div className="px-4 py-5 border-b border-white/10">
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">S</div>
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-base flex-shrink-0">S</div>
           <div>
-            <p className="text-white font-bold text-sm leading-tight">SideBSide</p>
-            <p className="text-blue-300 text-xs">Gestión de gastos</p>
+            <p className="text-white font-bold text-base leading-tight">SideBSide</p>
+            <p className="text-blue-300 text-base">Gestión de gastos</p>
           </div>
         </div>
         {user && (
@@ -72,14 +72,14 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar, noLeidas
             {avatar?.tipo === 'foto' && avatar.foto ? (
               <img src={avatar.foto} alt="avatar" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
             ) : (
-              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                style={{ backgroundColor: avatar?.valor ?? '#6366f1' }}>
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-base flex-shrink-0"
+                style={{ backgroundColor: avatar?.valor ?? '#4f46e5' }}>
                 {user.nombre[0]}
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-white text-sm font-semibold truncate">{user.nombre}</p>
-              <p className="text-blue-300 text-sm capitalize">Editar perfil</p>
+              <p className="text-white text-base font-semibold truncate">{user.nombre}</p>
+              <p className="text-blue-300 text-base capitalize">Editar perfil</p>
             </div>
           </NavLink>
         )}
@@ -92,9 +92,9 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar, noLeidas
             to={to}
             onClick={onNavigate}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors ${
+              `flex items-center gap-3 px-3 py-3 rounded-xl text-base transition-colors ${
                 isActive
-                  ? 'bg-blue-500 text-white font-semibold'
+                  ? 'bg-blue-600 text-white font-semibold'
                   : 'text-blue-100 hover:bg-white/10 hover:text-white active:bg-white/20'
               }`
             }
@@ -102,7 +102,7 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar, noLeidas
             <Icon size={18} />
             {label}
             {label === 'Notificaciones' && noLeidas > 0 && (
-              <span className="ml-auto bg-blue-500 text-white text-sm font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+              <span className="ml-auto bg-red-600 text-white text-base font-bold px-2 py-0.5 rounded-full min-w-[24px] text-center">
                 {noLeidas}
               </span>
             )}
@@ -113,7 +113,7 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar, noLeidas
       <div className="px-3 pb-4">
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-red-200 bg-red-500/20 w-full font-medium"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl text-base text-red-200 bg-red-500/20 w-full font-medium"
         >
           <LogOut size={18} />
           Cerrar sesión
@@ -131,6 +131,7 @@ export default function DashboardLayout({ role }) {
   const [logoutModal, setLogoutModal] = useState(false)
   const navItems = role === 'admin' ? adminNav : operadorNav
   const noLeidas = notificaciones.filter(n => !n.leido).length
+  const rutaNotificaciones = navItems.find(i => i.label === 'Notificaciones')?.to
 
   async function handleLogout() {
     await logout()
@@ -162,9 +163,22 @@ export default function DashboardLayout({ role }) {
         <header className="md:hidden bg-[#1a2456] px-4 py-3 flex items-center gap-3 flex-shrink-0 shadow">
           <IconButton icon={Menu} label="Abrir menú" onClick={() => setMobileOpen(true)} variant="ghostOnDark" iconSize={24} className="-ml-1.5" />
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm">S</div>
-            <span className="text-white font-bold text-sm">SideBSide</span>
+            <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-base">S</div>
+            <span className="text-white font-bold text-base">SideBSide</span>
           </div>
+          {/* En celular el menu esta cerrado casi siempre: sin esto, las
+              notificaciones nuevas no se veian hasta abrirlo. */}
+          {rutaNotificaciones && (
+            <NavLink to={rutaNotificaciones} aria-label={noLeidas > 0 ? `Notificaciones, ${noLeidas} sin leer` : 'Notificaciones'}
+              className="ml-auto relative w-11 h-11 flex items-center justify-center rounded-xl text-blue-100 hover:text-white hover:bg-white/10 active:bg-white/20 transition-colors">
+              <Bell size={22} />
+              {noLeidas > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-600 text-white text-base leading-none font-bold rounded-full min-w-6 h-6 px-1 flex items-center justify-center ring-2 ring-[#1a2456]">
+                  {noLeidas > 9 ? '9+' : noLeidas}
+                </span>
+              )}
+            </NavLink>
+          )}
         </header>
 
         <main className="flex-1 overflow-y-auto">

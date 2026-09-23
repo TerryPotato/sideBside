@@ -10,7 +10,7 @@ import { gastadoDeViaje } from '../../utils/presupuesto'
 import { formatDateRange } from '../../utils/date'
 
 const estadoChip = {
-  activo: 'bg-green-100 text-green-700',
+  activo: 'bg-green-100 text-green-800',
   completado: 'bg-gray-100 text-gray-600',
 }
 
@@ -90,11 +90,11 @@ export default function Viajes() {
       <div className="flex items-start justify-between mb-6 gap-2">
         <div>
           <h1 className="text-xl font-bold text-gray-800">Viajes</h1>
-          <p className="text-sm text-gray-700 mt-0.5">Asigna viajes a tus operadores y da seguimiento a su presupuesto. Usa "Revisar gastos" para aprobar o rechazar lo pendiente, "Editar" para ajustar fechas o presupuesto, y "Completar" cuando termine.</p>
+          <p className="text-base text-gray-700 mt-0.5">Asigna viajes a tus operadores y da seguimiento a su presupuesto. Usa "Revisar gastos" para aprobar o rechazar lo pendiente, "Editar" para ajustar fechas o presupuesto, y "Completar" cuando termine.</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3 py-2 sm:px-4 rounded-lg transition-colors flex-shrink-0"
+          className="min-h-11 py-2 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium px-3 sm:px-4 rounded-xl transition-colors flex-shrink-0"
         >
           <Plus size={16} /><span className="hidden sm:inline">Nuevo viaje</span>
         </button>
@@ -108,7 +108,7 @@ export default function Viajes() {
         title="¿Marcar viaje como completado?"
         message="El empleado ya no podra registrar nuevos gastos en este viaje y recibira una notificación."
         confirmLabel="Sí, completar"
-        confirmClass="bg-green-600 hover:bg-green-700"
+        confirmClass="bg-green-700 hover:bg-green-800"
         onConfirm={handleCompletar}
         onCancel={() => setViajeCompletando(null)}
       />
@@ -117,70 +117,70 @@ export default function Viajes() {
       {showForm && (
         <div className="bg-white rounded-xl border border-black shadow-sm p-5 mb-6 border border-blue-100">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-700">{viajeEditando ? `Editar viaje — ${viajeEditando.nombre}` : 'Nuevo viaje'}</h2>
+            <h2 className="text-base font-semibold text-gray-700">{viajeEditando ? `Editar viaje — ${viajeEditando.nombre}` : 'Nuevo viaje'}</h2>
             <button onClick={cerrarForm} className="text-gray-600 hover:text-gray-600"><X size={18} /></button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="flex items-center text-sm text-gray-600 mb-1">Nombre del viaje <span className="text-red-500 ml-1">*</span><FieldHint text="Un nombre que identifique fácilmente este viaje, por ejemplo el destino o el motivo." /></label>
+                <label className="flex items-center text-base text-gray-600 mb-1">Nombre del viaje <span className="text-red-600 ml-1">*</span><FieldHint text="Un nombre que identifique fácilmente este viaje, por ejemplo el destino o el motivo." /></label>
                 <input
                   type="text"
                   placeholder="Ej. Visita cliente Monterrey"
                   value={form.nombre}
                   onChange={e => set('nombre', e.target.value)}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.nombre ? 'border-red-400' : 'border-gray-300'}`}
+                  className={`w-full border-2 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.nombre ? 'border-red-400' : 'border-gray-300'}`}
                 />
-                {errors.nombre && <p className="text-sm text-red-500 mt-1">{errors.nombre}</p>}
+                {errors.nombre && <p className="text-base text-red-600 mt-1">{errors.nombre}</p>}
               </div>
               {!viajeEditando && (
                 <div>
-                  <label className="flex items-center text-sm text-gray-600 mb-1">Empleado <span className="text-red-500 ml-1">*</span><FieldHint text="El operador que va a registrar gastos en este viaje. No se puede cambiar después de creado." /></label>
+                  <label className="flex items-center text-base text-gray-600 mb-1">Empleado <span className="text-red-600 ml-1">*</span><FieldHint text="El operador que va a registrar gastos en este viaje. No se puede cambiar después de creado." /></label>
                   <select
                     value={form.usuario_id}
                     onChange={e => set('usuario_id', e.target.value)}
-                    className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white ${errors.usuario_id ? 'border-red-400' : 'border-gray-300'}`}
+                    className={`w-full border-2 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white ${errors.usuario_id ? 'border-red-400' : 'border-gray-300'}`}
                   >
                     <option value="">Seleccionar empleado</option>
                     {operadores.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
                   </select>
-                  {errors.usuario_id && <p className="text-sm text-red-500 mt-1">{errors.usuario_id}</p>}
+                  {errors.usuario_id && <p className="text-base text-red-600 mt-1">{errors.usuario_id}</p>}
                 </div>
               )}
               <div>
-                <label className="flex items-center text-sm text-gray-600 mb-1">Presupuesto <span className="text-gray-600 font-normal ml-1">(opcional)</span><FieldHint text="Monto máximo estimado para este viaje. Te permite ver qué tanto se ha gastado en la barra de progreso." /></label>
+                <label className="flex items-center text-base text-gray-600 mb-1">Presupuesto <span className="text-gray-600 font-normal ml-1">(opcional)</span><FieldHint text="Monto máximo estimado para este viaje. Te permite ver qué tanto se ha gastado en la barra de progreso." /></label>
                 <input
                   type="number"
                   placeholder="$ 0.00"
                   value={form.presupuesto}
                   onChange={e => set('presupuesto', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
               <div>
-                <label className="flex items-center text-sm text-gray-600 mb-1">Fecha inicio <span className="text-red-500 ml-1">*</span><FieldHint text="El día en que el operador puede empezar a registrar gastos de este viaje." /></label>
+                <label className="flex items-center text-base text-gray-600 mb-1">Fecha inicio <span className="text-red-600 ml-1">*</span><FieldHint text="El día en que el operador puede empezar a registrar gastos de este viaje." /></label>
                 <input
                   type="date"
                   value={form.fecha_inicio}
                   onChange={e => set('fecha_inicio', e.target.value)}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.fecha_inicio ? 'border-red-400' : 'border-gray-300'}`}
+                  className={`w-full border-2 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.fecha_inicio ? 'border-red-400' : 'border-gray-300'}`}
                 />
-                {errors.fecha_inicio && <p className="text-sm text-red-500 mt-1">{errors.fecha_inicio}</p>}
+                {errors.fecha_inicio && <p className="text-base text-red-600 mt-1">{errors.fecha_inicio}</p>}
               </div>
               <div>
-                <label className="flex items-center text-sm text-gray-600 mb-1">Fecha fin <span className="text-red-500 ml-1">*</span><FieldHint text="El último día del viaje. Ese día le mandamos un recordatorio al operador para que termine de registrar sus gastos." /></label>
+                <label className="flex items-center text-base text-gray-600 mb-1">Fecha fin <span className="text-red-600 ml-1">*</span><FieldHint text="El último día del viaje. Ese día le mandamos un recordatorio al operador para que termine de registrar sus gastos." /></label>
                 <input
                   type="date"
                   value={form.fecha_fin}
                   onChange={e => set('fecha_fin', e.target.value)}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.fecha_fin ? 'border-red-400' : 'border-gray-300'}`}
+                  className={`w-full border-2 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.fecha_fin ? 'border-red-400' : 'border-gray-300'}`}
                 />
-                {errors.fecha_fin && <p className="text-sm text-red-500 mt-1">{errors.fecha_fin}</p>}
+                {errors.fecha_fin && <p className="text-base text-red-600 mt-1">{errors.fecha_fin}</p>}
               </div>
             </div>
             <div className="flex gap-3 pt-1">
-              <button type="button" onClick={cerrarForm} className="flex-1 border border-gray-300 text-gray-700 font-medium py-2 rounded-lg text-sm hover:bg-gray-50">Cancelar</button>
-              <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm transition-colors">{viajeEditando ? 'Guardar cambios' : 'Crear viaje'}</button>
+              <button type="button" onClick={cerrarForm} className="min-h-11 py-2 flex-1 border border-gray-300 text-gray-700 font-medium rounded-xl text-base hover:bg-gray-50">Cancelar</button>
+              <button type="submit" className="min-h-11 py-2 flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-base transition-colors">{viajeEditando ? 'Guardar cambios' : 'Crear viaje'}</button>
             </div>
           </form>
         </div>
@@ -196,18 +196,18 @@ export default function Viajes() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className="text-sm font-semibold text-gray-800">{v.nombre}</h3>
-                    <span className={`text-sm px-2 py-0.5 rounded-full font-medium ${estadoChip[v.estado]}`}>{v.estado}</span>
+                    <h3 className="text-base font-semibold text-gray-800">{v.nombre}</h3>
+                    <span className={`text-base px-2 py-0.5 rounded-full font-medium ${estadoChip[v.estado]}`}>{v.estado}</span>
                     {pendientes > 0 && (
-                      <span className="text-sm px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-700">
+                      <span className="text-base px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-700">
                         {pendientes} pendiente{pendientes !== 1 ? 's' : ''}
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-700 mb-2">
-                    <span className="flex items-center gap-1"><User size={12} />{v.usuario}</span>
-                    <span className="flex items-center gap-1"><Calendar size={12} />{formatDateRange(v.fecha_inicio, v.fecha_fin)}</span>
-                    <span className="flex items-center gap-1"><MapPin size={12} />{gastos.length} gasto{gastos.length !== 1 ? 's' : ''} registrado{gastos.length !== 1 ? 's' : ''}</span>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-base text-gray-700 mb-2">
+                    <span className="flex items-center gap-1"><User size={16} />{v.usuario}</span>
+                    <span className="flex items-center gap-1"><Calendar size={16} />{formatDateRange(v.fecha_inicio, v.fecha_fin)}</span>
+                    <span className="flex items-center gap-1"><MapPin size={16} />{gastos.length} gasto{gastos.length !== 1 ? 's' : ''} registrado{gastos.length !== 1 ? 's' : ''}</span>
                   </div>
                   {v.presupuesto > 0 && (
                     <div className="max-w-xs">
@@ -219,7 +219,7 @@ export default function Viajes() {
                   {pendientes > 0 && (
                     <button
                       onClick={() => setViajeModal(v)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                      className="min-h-11 py-2 inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-base font-medium px-4 rounded-xl transition-colors"
                     >
                       Revisar gastos
                     </button>
@@ -229,16 +229,16 @@ export default function Viajes() {
                       <button
                         onClick={() => abrirEdicion(v)}
                         title="Editar viaje"
-                        className="flex items-center justify-center gap-1.5 border border-gray-300 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="min-h-11 py-2 flex items-center justify-center gap-1.5 border border-gray-300 text-gray-700 text-base font-medium px-3 rounded-xl hover:bg-gray-50 transition-colors"
                       >
-                        <Pencil size={14} /><span className="hidden sm:inline">Editar</span>
+                        <Pencil size={16} /><span className="hidden sm:inline">Editar</span>
                       </button>
                       <button
                         onClick={() => setViajeCompletando(v)}
                         title="Marcar como completado"
-                        className="flex items-center justify-center gap-1.5 border border-gray-300 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="min-h-11 py-2 flex items-center justify-center gap-1.5 border border-gray-300 text-gray-700 text-base font-medium px-3 rounded-xl hover:bg-gray-50 transition-colors"
                       >
-                        <CheckCircle2 size={14} /><span className="hidden sm:inline">Completar</span>
+                        <CheckCircle2 size={16} /><span className="hidden sm:inline">Completar</span>
                       </button>
                     </>
                   )}

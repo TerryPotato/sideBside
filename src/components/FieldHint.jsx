@@ -24,14 +24,14 @@ export default function FieldHint({ text }) {
         onClick={() => setOpen(o => !o)}
         aria-label="Ayuda sobre este campo"
         aria-expanded={open}
-        className={`w-4 h-4 flex items-center justify-center rounded-full transition-colors flex-shrink-0 ${
-          open ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+        className={`w-6 h-6 flex items-center justify-center rounded-full transition-colors flex-shrink-0 ${
+          open ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
         }`}
       >
-        <HelpCircle size={11} strokeWidth={2.5} />
+        <HelpCircle size={16} strokeWidth={2.5} />
       </button>
       {open && (
-        <div className="absolute z-30 top-full left-0 mt-2 w-60 max-w-[80vw] bg-gray-900 text-white text-sm font-normal leading-snug rounded-lg px-3 py-2 shadow-xl">
+        <div className="absolute z-30 top-full left-0 mt-2 w-60 max-w-[80vw] bg-gray-900 text-white text-base font-normal leading-snug rounded-lg px-3 py-2 shadow-xl">
           {text}
         </div>
       )}

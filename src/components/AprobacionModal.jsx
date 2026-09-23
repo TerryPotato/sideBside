@@ -39,7 +39,7 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
         <div className="relative bg-white rounded-2xl shadow-2xl p-8 z-10 text-center">
           <Check size={40} className="text-green-500 mx-auto mb-3" />
           <p className="text-gray-700 font-medium">No hay gastos pendientes en este viaje</p>
-          <button onClick={onClose} className="mt-4 text-sm text-blue-500 hover:underline">Cerrar</button>
+          <button onClick={onClose} className="mt-4 text-base text-blue-600 hover:underline">Cerrar</button>
         </div>
       </div>
     )
@@ -91,7 +91,7 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
         title="¿Aprobar este gasto?"
         message={`Se aprobará el gasto de $${gasto.monto?.toFixed(2)} y el empleado recibirá una notificación. Esta acción no se puede deshacer.`}
         confirmLabel="Sí, aprobar"
-        confirmClass="bg-green-600 hover:bg-green-700"
+        confirmClass="bg-green-700 hover:bg-green-800"
         onConfirm={handleAprobar}
         onCancel={() => setConfirmandoAprobar(false)}
       />
@@ -101,13 +101,13 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b bg-[#1a2456]">
           <div className="flex items-center gap-3 min-w-0">
-            <h2 className="text-white font-semibold text-sm truncate">{viaje.nombre}</h2>
-            <span className="bg-yellow-400 text-yellow-900 text-sm font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+            <h2 className="text-white font-semibold text-base truncate">{viaje.nombre}</h2>
+            <span className="bg-yellow-400 text-yellow-900 text-base font-bold px-2 py-0.5 rounded-full flex-shrink-0">
               {total} pendiente{total !== 1 ? 's' : ''}
             </span>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className="text-blue-200 text-sm">{idx + 1} / {total}</span>
+            <span className="text-blue-200 text-base">{idx + 1} / {total}</span>
             <IconButton icon={X} label="Cerrar" onClick={onClose} variant="ghostOnDark" size="sm" iconSize={20} />
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
             ) : (
               <div className="flex flex-col items-center gap-3 text-gray-700">
                 <ImageOff size={40} className="opacity-40" />
-                <p className="text-sm text-center opacity-60">Sin comprobante adjunto</p>
+                <p className="text-base text-center">Sin comprobante adjunto</p>
               </div>
             )}
 
@@ -147,12 +147,12 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
           <div className="sm:w-1/2 flex flex-col overflow-y-auto">
             <div className="flex-1 p-5 space-y-4">
               <div>
-                <p className="text-sm text-gray-600 uppercase tracking-wide mb-3">Datos del gasto</p>
-                <DataRow icon={<DollarSign size={14} />} label="Monto" value={<span className="text-lg font-bold text-gray-900">${gasto.monto.toFixed(2)}</span>} />
-                {gasto.iva > 0 && <DataRow icon={<DollarSign size={14} />} label="IVA" value={`$${gasto.iva.toFixed(2)}`} />}
-                <DataRow icon={<Tag size={14} />} label="Categoría" value={gasto.categoria} />
-                <DataRow icon={<Calendar size={14} />} label="Fecha" value={formatDate(gasto.fecha)} />
-                {gasto.ubicacion && <DataRow icon={<MapPin size={14} />} label="Ubicación" value={gasto.ubicacion} />}
+                <p className="text-base text-gray-600 uppercase tracking-wide mb-3">Datos del gasto</p>
+                <DataRow icon={<DollarSign size={16} />} label="Monto" value={<span className="text-lg font-bold text-gray-900">${gasto.monto.toFixed(2)}</span>} />
+                {gasto.iva > 0 && <DataRow icon={<DollarSign size={16} />} label="IVA" value={`$${gasto.iva.toFixed(2)}`} />}
+                <DataRow icon={<Tag size={16} />} label="Categoría" value={gasto.categoria} />
+                <DataRow icon={<Calendar size={16} />} label="Fecha" value={formatDate(gasto.fecha)} />
+                {gasto.ubicacion && <DataRow icon={<MapPin size={16} />} label="Ubicación" value={gasto.ubicacion} />}
               </div>
 
               {(gasto.factura_url || gasto.factura_xml_url) && (
@@ -168,9 +168,9 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
                           toast.error(err.message)
                         }
                       }}
-                      className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-fit"
+                      className="flex items-center gap-2 text-base text-blue-600 hover:underline w-fit"
                     >
-                      <FileText size={14} /> Ver factura (PDF)
+                      <FileText size={16} /> Ver factura (PDF)
                     </button>
                   )}
                   {gasto.factura_xml_url && (
@@ -184,9 +184,9 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
                           toast.error(err.message)
                         }
                       }}
-                      className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-fit"
+                      className="flex items-center gap-2 text-base text-blue-600 hover:underline w-fit"
                     >
-                      <FileText size={14} /> Ver factura (XML)
+                      <FileText size={16} /> Ver factura (XML)
                     </button>
                   )}
                 </div>
@@ -194,27 +194,27 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
 
               {gasto.descripcion && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Descripción</p>
-                  <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{gasto.descripcion}</p>
+                  <p className="text-base text-gray-600 mb-1">Descripción</p>
+                  <p className="text-base text-gray-700 bg-gray-50 rounded-lg p-3">{gasto.descripcion}</p>
                 </div>
               )}
 
               <div>
-                <p className="text-sm text-gray-600 mb-1">Empleado</p>
-                <p className="text-sm font-medium text-gray-800">{gasto.empleado}</p>
+                <p className="text-base text-gray-600 mb-1">Empleado</p>
+                <p className="text-base font-medium text-gray-800">{gasto.empleado}</p>
               </div>
 
               {/* Comentario rechazo */}
               {rechazando && (
                 <div>
-                  <label className="text-sm text-gray-600 mb-1.5 block">Motivo del rechazo <span className="text-red-500">*</span></label>
+                  <label className="text-base text-gray-600 mb-1.5 block">Motivo del rechazo <span className="text-red-600">*</span></label>
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {MOTIVOS_RECHAZO.map(motivo => (
                       <button
                         key={motivo}
                         type="button"
                         onClick={() => setComentario(c => c ? `${c}${c.endsWith('.') ? '' : '.'} ${motivo}` : motivo)}
-                        className="text-sm bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-700 border border-red-200 px-2.5 py-1 rounded-full transition-colors"
+                        className="min-h-11 py-2 inline-flex items-center justify-center text-base bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-700 border border-red-200 px-2.5 rounded-xl transition-colors"
                       >
                         {motivo}
                       </button>
@@ -226,7 +226,7 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
                     onChange={e => setComentario(e.target.value)}
                     placeholder="Explica por qué se rechaza este gasto..."
                     rows={3}
-                    className="w-full border border-red-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
+                    className="w-full border-2 border-red-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
                   />
                 </div>
               )}
@@ -239,14 +239,14 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
                   <button
                     onClick={() => setConfirmandoAprobar(true)}
                     disabled={enviando}
-                    className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
+                    className="min-h-11 py-2 flex-1 flex items-center justify-center gap-2 bg-green-700 hover:bg-green-800 disabled:opacity-50 text-white font-medium rounded-xl text-base transition-colors"
                   >
                     <Check size={16} /> Aprobar
                   </button>
                   <button
                     onClick={() => setRechazando(true)}
                     disabled={enviando}
-                    className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
+                    className="min-h-11 py-2 flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium rounded-xl text-base transition-colors"
                   >
                     <XCircle size={16} /> Rechazar
                   </button>
@@ -256,14 +256,14 @@ export default function AprobacionModal({ viaje, onClose, initialIdx = 0 }) {
                   <button
                     onClick={() => { setRechazando(false); setComentario('') }}
                     disabled={enviando}
-                    className="flex-1 border border-gray-300 text-gray-700 font-medium py-2.5 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                    className="min-h-11 py-2 flex-1 border border-gray-300 text-gray-700 font-medium rounded-xl text-base hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleRechazar}
                     disabled={enviando}
-                    className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
+                    className="min-h-11 py-2 flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium rounded-xl text-base transition-colors"
                   >
                     <XCircle size={16} /> Confirmar rechazo
                   </button>
@@ -281,8 +281,8 @@ function DataRow({ icon, label, value }) {
   return (
     <div className="flex items-start gap-2 py-1.5 border-b border-gray-100 last:border-0">
       <span className="text-gray-600 mt-0.5 flex-shrink-0">{icon}</span>
-      <span className="text-sm text-gray-600 w-20 flex-shrink-0 mt-0.5">{label}</span>
-      <span className="text-sm text-gray-800">{value}</span>
+      <span className="text-base text-gray-600 w-20 flex-shrink-0 mt-0.5">{label}</span>
+      <span className="text-base text-gray-800">{value}</span>
     </div>
   )
 }

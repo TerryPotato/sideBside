@@ -32,13 +32,13 @@ export default function ComprobanteImage({ gastoId, className, emptyLabel = 'Sin
     return (
       <div className="flex flex-col items-center gap-2 text-gray-700">
         <ImageOff size={32} className="opacity-40" />
-        <p className="text-sm opacity-50">{emptyLabel}</p>
+        <p className="text-base">{emptyLabel}</p>
       </div>
     )
   }
 
   if (!url) {
-    return <Loader2 size={28} className="text-gray-400 animate-spin" />
+    return <Loader2 size={28} className="text-gray-600 animate-spin" />
   }
 
   return <img src={url} alt="comprobante" className={className ?? 'max-h-full max-w-full object-contain'} />

@@ -22,11 +22,11 @@ const ZONAS_HORARIAS = [
 ]
 
 const COLORES = [
-  { valor: '#6366f1', nombre: 'Índigo' },
-  { valor: '#f43f5e', nombre: 'Rosa' },
-  { valor: '#10b981', nombre: 'Esmeralda' },
-  { valor: '#f59e0b', nombre: 'Ámbar' },
-  { valor: '#0ea5e9', nombre: 'Cielo' },
+  { valor: '#4f46e5', nombre: 'Índigo' },
+  { valor: '#e11d48', nombre: 'Rosa' },
+  { valor: '#047857', nombre: 'Esmeralda' },
+  { valor: '#b45309', nombre: 'Ámbar' },
+  { valor: '#0369a1', nombre: 'Cielo' },
 ]
 
 const emptyClave = { actual: '', nueva: '', confirmar: '' }
@@ -88,31 +88,32 @@ export default function Perfil() {
     <div className="p-4 sm:p-6 max-w-lg mx-auto space-y-4">
       <div>
         <h1 className="text-xl font-bold text-gray-900">Mi Perfil</h1>
-        <p className="text-sm text-gray-700 mt-0.5">Personaliza el color de tu avatar, ajusta tu zona horaria y cambia tu contraseña.</p>
+        <p className="text-base text-gray-700 mt-0.5">Personaliza el color de tu avatar, ajusta tu zona horaria y cambia tu contraseña.</p>
       </div>
 
       {/* Avatar */}
       <div className="bg-white rounded-2xl border border-black shadow-sm p-5">
         <div className="flex items-center gap-4 mb-5">
           <div className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold flex-shrink-0"
-            style={{ backgroundColor: avatar?.valor ?? '#6366f1' }}>
+            style={{ backgroundColor: avatar?.valor ?? '#4f46e5' }}>
             {inicial}
           </div>
           <div>
             <p className="font-bold text-gray-900">{form.nombre}</p>
-            <p className="text-sm text-gray-700 capitalize">{user?.rol}</p>
+            <p className="text-base text-gray-700 capitalize">{user?.rol}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 mb-4">
           <Palette size={16} className="text-gray-600" />
-          <p className="text-sm font-semibold text-gray-700">Color de tu perfil</p>
+          <p className="text-base font-semibold text-gray-700">Color de tu perfil</p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
           {COLORES.map(c => (
             <button key={c.valor} onClick={() => handleColor(c.valor)} title={c.nombre}
-              className="relative w-10 h-10 rounded-full transition-transform hover:scale-110 active:scale-95 focus:outline-none"
+              aria-label={`Color ${c.nombre}`} aria-pressed={avatar?.tipo === 'color' && avatar.valor === c.valor}
+              className="relative w-11 h-11 rounded-full transition-transform hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
               style={{ backgroundColor: c.valor }}>
               {avatar?.tipo === 'color' && avatar.valor === c.valor && (
                 <span className="absolute inset-0 rounded-full ring-3 ring-offset-2 ring-gray-800" />
@@ -123,13 +124,13 @@ export default function Perfil() {
             <div className="relative w-10 h-10 rounded-full flex-shrink-0 hover:scale-110 active:scale-95 transition-transform"
               style={{ background: 'conic-gradient(from 0deg, #ef4444, #f59e0b, #eab308, #22c55e, #06b6d4, #3b82f6, #a855f7, #ec4899, #ef4444)' }}>
               <div className="absolute inset-[3px] rounded-full bg-white flex items-center justify-center pointer-events-none">
-                <Pipette size={15} className="text-gray-600" />
+                <Pipette size={18} className="text-gray-600" />
               </div>
-              <input type="color" value={avatar?.tipo === 'color' ? avatar.valor : '#6366f1'} onChange={handleColorLibre}
+              <input type="color" value={avatar?.tipo === 'color' ? avatar.valor : '#4f46e5'} onChange={handleColorLibre}
                 title="Color personalizado"
                 className="absolute inset-0 w-full h-full rounded-full opacity-0 cursor-pointer" />
             </div>
-            <span className="text-sm text-gray-600 font-mono">{avatar?.tipo === 'color' ? avatar.valor : '#6366f1'}</span>
+            <span className="text-base text-gray-600 font-mono">{avatar?.tipo === 'color' ? avatar.valor : '#4f46e5'}</span>
           </div>
         </div>
       </div>
@@ -137,8 +138,8 @@ export default function Perfil() {
       {/* Datos */}
       <div className="bg-white rounded-2xl border border-black shadow-sm p-5 space-y-4">
         <div>
-          <p className="text-sm font-bold text-gray-900">Datos personales</p>
-          <p className="text-sm text-gray-700 mt-0.5">Administrados por tu empresa. Si algo está desactualizado, pide a tu administrador que lo corrija.</p>
+          <p className="text-base font-bold text-gray-900">Datos personales</p>
+          <p className="text-base text-gray-700 mt-0.5">Administrados por tu empresa. Si algo está desactualizado, pide a tu administrador que lo corrija.</p>
         </div>
         <div className="space-y-3">
           {[
@@ -147,12 +148,12 @@ export default function Perfil() {
             { field: 'email', label: 'Correo electrónico', icon: Mail, value: form.email },
           ].map(({ field, label, icon: Icon, value }) => (
             <div key={field}>
-              <label className="block text-sm font-semibold text-gray-600 mb-1.5">{label}</label>
+              <label className="block text-base font-semibold text-gray-600 mb-1.5">{label}</label>
               <div className="relative">
-                <Icon size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600" />
+                <Icon size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600" />
                 <input type="text" value={value} readOnly disabled
                   title="Asignado por la empresa, no editable"
-                  className="w-full border-2 border-gray-200 bg-gray-50 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-700 cursor-not-allowed" />
+                  className="w-full border-2 border-gray-200 bg-gray-50 rounded-xl pl-10 pr-4 py-3 text-base text-gray-700 cursor-not-allowed" />
               </div>
             </div>
           ))}
@@ -163,14 +164,14 @@ export default function Perfil() {
       <div className="bg-white rounded-2xl border border-black shadow-sm p-5">
         <div className="flex items-center gap-2 mb-3">
           <Globe size={16} className="text-gray-600" />
-          <p className="text-sm font-bold text-gray-900">Zona horaria</p>
+          <p className="text-base font-bold text-gray-900">Zona horaria</p>
         </div>
-        <p className="text-sm text-gray-700 mb-3">Las fechas y horas de tus gastos y notificaciones se mostrarán con esta zona horaria.</p>
+        <p className="text-base text-gray-700 mb-3">Las fechas y horas de tus gastos y notificaciones se mostrarán con esta zona horaria.</p>
         <select
           value={user?.zona_horaria ?? 'America/Mexico_City'}
           onChange={handleZonaHoraria}
           disabled={guardandoZona}
-          className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm bg-white focus:outline-none focus:border-blue-500 disabled:opacity-50"
+          className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base bg-white focus:outline-none focus:border-blue-500 disabled:opacity-50"
         >
           {ZONAS_HORARIAS.map(z => <option key={z.valor} value={z.valor}>{z.label}</option>)}
         </select>
@@ -180,27 +181,27 @@ export default function Perfil() {
       <div className="bg-white rounded-2xl border border-black shadow-sm p-5">
         <div className="flex items-center gap-2 mb-4">
           <Lock size={16} className="text-gray-600" />
-          <p className="text-sm font-bold text-gray-900">Cambiar contraseña</p>
+          <p className="text-base font-bold text-gray-900">Cambiar contraseña</p>
         </div>
         <form onSubmit={handleCambiarClave} className="space-y-3">
           <div>
-            <label className="flex items-center text-sm font-semibold text-gray-600 mb-1.5">Contraseña actual<FieldHint text="Tu contraseña actual, para confirmar que eres tú quien hace el cambio." /></label>
+            <label className="flex items-center text-base font-semibold text-gray-600 mb-1.5">Contraseña actual<FieldHint text="Tu contraseña actual, para confirmar que eres tú quien hace el cambio." /></label>
             <input type={verClave ? 'text' : 'password'} value={clave.actual}
               onChange={e => setClave(c => ({ ...c, actual: e.target.value }))}
-              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" />
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
           <div>
-            <label className="flex items-center text-sm font-semibold text-gray-600 mb-1.5">Nueva contraseña<FieldHint text="Mínimo 8 caracteres, con al menos una letra y un número." /></label>
+            <label className="flex items-center text-base font-semibold text-gray-600 mb-1.5">Nueva contraseña<FieldHint text="Mínimo 8 caracteres, con al menos una letra y un número." /></label>
             <input type={verClave ? 'text' : 'password'} value={clave.nueva}
               onChange={e => setClave(c => ({ ...c, nueva: e.target.value }))}
-              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" />
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
           <div>
-            <label className="flex items-center text-sm font-semibold text-gray-600 mb-1.5">Confirmar nueva contraseña<FieldHint text="Vuelve a escribir la misma contraseña nueva para evitar errores de dedo." /></label>
+            <label className="flex items-center text-base font-semibold text-gray-600 mb-1.5">Confirmar nueva contraseña<FieldHint text="Vuelve a escribir la misma contraseña nueva para evitar errores de dedo." /></label>
             <div className="relative">
               <input type={verClave ? 'text' : 'password'} value={clave.confirmar}
                 onChange={e => setClave(c => ({ ...c, confirmar: e.target.value }))}
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:border-blue-500" />
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-base focus:outline-none focus:border-blue-500" />
               <button type="button" onClick={() => setVerClave(v => !v)}
                 className="absolute inset-y-0 right-0 w-11 flex items-center justify-center text-gray-700 hover:text-gray-700">
                 {verClave ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -208,7 +209,7 @@ export default function Perfil() {
             </div>
           </div>
           <button type="submit" disabled={enviando}
-            className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white font-bold py-3 rounded-xl text-sm transition-colors">
+            className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white font-bold rounded-xl text-base transition-colors">
             {enviando ? 'Guardando...' : 'Actualizar contraseña'}
           </button>
         </form>

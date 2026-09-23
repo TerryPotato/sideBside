@@ -17,10 +17,10 @@ function UsuarioCreadoModal({ usuario, onClose }) {
           <MailCheck size={22} className="text-blue-600" />
         </div>
         <h3 className="text-base font-bold text-gray-900 text-center mb-1">Usuario creado</h3>
-        <p className="text-sm text-gray-600 text-center mb-4">
+        <p className="text-base text-gray-600 text-center mb-4">
           Enviamos la contraseña temporal por correo a <span className="font-semibold">{usuario.nombre}</span> ({usuario.email}). Por seguridad, no se muestra aquí.
         </p>
-        <button onClick={onClose} className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">
+        <button onClick={onClose} className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl text-base transition-colors">
           Entendido
         </button>
       </div>
@@ -44,21 +44,21 @@ function DeleteModal({ usuario, onConfirm, onCancel }) {
           <Trash2 size={22} className="text-red-600" />
         </div>
         <h3 className="text-base font-bold text-gray-900 text-center mb-1">¿Desactivar usuario?</h3>
-        <p className="text-sm text-gray-700 text-center mb-4">Dejará de aparecer en la lista y no podrá iniciar sesión. Para confirmar, escribe el nombre del usuario:</p>
-        <p className="text-sm font-bold text-gray-900 text-center mb-3">"{usuario.nombre}"</p>
+        <p className="text-base text-gray-700 text-center mb-4">Dejará de aparecer en la lista y no podrá iniciar sesión. Para confirmar, escribe el nombre del usuario:</p>
+        <p className="text-base font-bold text-gray-900 text-center mb-3">"{usuario.nombre}"</p>
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
           placeholder="Escribe el nombre aquí"
-          className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-400 mb-4"
+          className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-red-400 mb-4"
           autoFocus
         />
         <div className="flex flex-col gap-2">
           <button onClick={onConfirm} disabled={!match}
-            className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl text-sm transition-colors">
+            className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold rounded-xl text-base transition-colors">
             Desactivar usuario
           </button>
-          <button onClick={onCancel} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-colors">
+          <button onClick={onCancel} className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-base transition-colors">
             Cancelar
           </button>
         </div>
@@ -130,9 +130,9 @@ export default function Usuarios() {
       <div className="flex items-start justify-between mb-5 gap-2">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Usuarios</h1>
-          <p className="text-sm text-gray-700 mt-0.5">Da de alta a tus operadores y administradores. Al crear uno, la contraseña temporal se le manda directo a su correo.</p>
+          <p className="text-base text-gray-700 mt-0.5">Da de alta a tus operadores y administradores. Al crear uno, la contraseña temporal se le manda directo a su correo.</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors shadow-sm flex-shrink-0">
+        <button onClick={() => setShowForm(true)} className="min-h-11 py-2 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 rounded-xl text-base transition-colors shadow-sm flex-shrink-0">
           <Plus size={16} /> Nuevo usuario
         </button>
       </div>
@@ -144,7 +144,7 @@ export default function Usuarios() {
           value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
           placeholder="Buscar por nombre, correo o número de empleado..."
-          className="w-full border-2 border-gray-200 rounded-xl pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+          className="w-full border-2 border-gray-200 rounded-xl pl-10 pr-4 py-3 text-base focus:outline-none focus:border-blue-500"
         />
       </div>
 
@@ -163,16 +163,16 @@ export default function Usuarios() {
                 { f: 'num_empleado', label: 'Número de empleado', hint: 'El identificador interno de tu empresa para este empleado.' },
               ].map(({ f, label, hint }) => (
                 <div key={f} className={f === 'nombre' ? 'sm:col-span-2' : ''}>
-                  <label className="flex items-center text-sm font-semibold text-gray-600 mb-1">{label} <span className="text-red-500 ml-1">*</span><FieldHint text={hint} /></label>
+                  <label className="flex items-center text-base font-semibold text-gray-600 mb-1">{label} <span className="text-red-600 ml-1">*</span><FieldHint text={hint} /></label>
                   <input value={form[f]} onChange={e => set(f, e.target.value)}
-                    className={`w-full border-2 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 ${errors[f] ? 'border-red-400' : 'border-gray-200'}`} />
-                  {errors[f] && <p className="text-sm text-red-500 mt-1">{errors[f]}</p>}
+                    className={`w-full border-2 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 ${errors[f] ? 'border-red-400' : 'border-gray-200'}`} />
+                  {errors[f] && <p className="text-base text-red-600 mt-1">{errors[f]}</p>}
                 </div>
               ))}
               <div>
-                <label className="flex items-center text-sm font-semibold text-gray-600 mb-1">Rol<FieldHint text="Operador solo registra y ve sus propios gastos. Administrador puede aprobar gastos y gestionar todo el equipo." /></label>
+                <label className="flex items-center text-base font-semibold text-gray-600 mb-1">Rol<FieldHint text="Operador solo registra y ve sus propios gastos. Administrador puede aprobar gastos y gestionar todo el equipo." /></label>
                 <select value={form.rol} onChange={e => set('rol', e.target.value)}
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 bg-white">
+                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 bg-white">
                   <option value="operador">Operador</option>
                   <option value="admin">Administrador</option>
                 </select>
@@ -180,8 +180,8 @@ export default function Usuarios() {
             </div>
             <div className="flex gap-2 pt-1">
               <button type="button" onClick={() => { setShowForm(false); setErrors({}) }}
-                className="flex-1 border-2 border-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">Cancelar</button>
-              <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Crear usuario</button>
+                className="min-h-11 py-2 flex-1 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl text-base hover:bg-gray-50 transition-colors">Cancelar</button>
+              <button type="submit" className="min-h-11 py-2 flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-base transition-colors">Crear usuario</button>
             </div>
           </form>
         </div>
@@ -190,32 +190,32 @@ export default function Usuarios() {
       {/* Lista desktop */}
       <div className="bg-white rounded-2xl border border-black shadow-sm overflow-hidden">
         <div className="hidden sm:block overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-base">
             <thead>
               <tr className="text-left bg-gray-50 border-b border-gray-100">
-                <th className="px-5 py-3 text-sm font-bold text-gray-700 uppercase tracking-wide">Empleado</th>
-                <th className="px-5 py-3 text-sm font-bold text-gray-700 uppercase tracking-wide">No. Empleado</th>
-                <th className="px-5 py-3 text-sm font-bold text-gray-700 uppercase tracking-wide">Correo</th>
-                <th className="px-5 py-3 text-sm font-bold text-gray-700 uppercase tracking-wide">Rol</th>
-                <th className="px-5 py-3 text-sm font-bold text-gray-700 uppercase tracking-wide">Acciones</th>
+                <th className="px-5 py-3 text-base font-bold text-gray-700 uppercase tracking-wide">Empleado</th>
+                <th className="px-5 py-3 text-base font-bold text-gray-700 uppercase tracking-wide">No. Empleado</th>
+                <th className="px-5 py-3 text-base font-bold text-gray-700 uppercase tracking-wide">Correo</th>
+                <th className="px-5 py-3 text-base font-bold text-gray-700 uppercase tracking-wide">Rol</th>
+                <th className="px-5 py-3 text-base font-bold text-gray-700 uppercase tracking-wide">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {usuariosFiltrados.map(u => (
                 <tr key={u.id} className="hover:bg-gray-50">
                   <td className="px-5 py-3.5 font-semibold text-gray-900">{u.nombre}</td>
-                  <td className="px-5 py-3.5 font-mono text-sm text-gray-600">{u.num_empleado || '—'}</td>
+                  <td className="px-5 py-3.5 font-mono text-base text-gray-600">{u.num_empleado || '—'}</td>
                   <td className="px-5 py-3.5 text-gray-600">{u.email}</td>
                   <td className="px-5 py-3.5">
-                    <span className={`px-2.5 py-1 rounded-full text-sm font-bold ${rolBadge[u.rol] ?? 'bg-gray-100 text-gray-600'}`}>{u.rol ?? 'operador'}</span>
+                    <span className={`px-2.5 py-1 rounded-full text-base font-bold ${rolBadge[u.rol] ?? 'bg-gray-100 text-gray-600'}`}>{u.rol ?? 'operador'}</span>
                   </td>
                   <td className="px-5 py-3.5">
-                    <IconButton icon={Trash2} label={`Eliminar a ${u.nombre}`} onClick={() => setDeleteTarget(u)} variant="danger" rounded="rounded-lg" iconSize={15} />
+                    <IconButton icon={Trash2} label={`Eliminar a ${u.nombre}`} onClick={() => setDeleteTarget(u)} variant="danger" iconSize={18} />
                   </td>
                 </tr>
               ))}
               {usuariosFiltrados.length === 0 && (
-                <tr><td colSpan={5} className="px-5 py-8 text-center text-sm text-gray-700">Ningún usuario coincide con "{busqueda}"</td></tr>
+                <tr><td colSpan={5} className="px-5 py-8 text-center text-base text-gray-700">Ningún usuario coincide con "{busqueda}"</td></tr>
               )}
             </tbody>
           </table>
@@ -224,19 +224,19 @@ export default function Usuarios() {
         {/* Cards mobile */}
         <div className="sm:hidden divide-y divide-gray-100">
           {usuariosFiltrados.length === 0 && (
-            <p className="px-4 py-8 text-center text-sm text-gray-700">Ningún usuario coincide con "{busqueda}"</p>
+            <p className="px-4 py-8 text-center text-base text-gray-700">Ningún usuario coincide con "{busqueda}"</p>
           )}
           {usuariosFiltrados.map(u => (
             <div key={u.id} className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-base flex-shrink-0">
                 {u.nombre[0]}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 text-sm">{u.nombre}</p>
-                <p className="text-sm text-gray-700">{u.num_empleado || '—'} · {u.email}</p>
-                <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-sm font-bold ${rolBadge[u.rol] ?? 'bg-gray-100 text-gray-600'}`}>{u.rol ?? 'operador'}</span>
+                <p className="font-semibold text-gray-900 text-base">{u.nombre}</p>
+                <p className="text-base text-gray-700">{u.num_empleado || '—'} · {u.email}</p>
+                <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-base font-bold ${rolBadge[u.rol] ?? 'bg-gray-100 text-gray-600'}`}>{u.rol ?? 'operador'}</span>
               </div>
-              <button onClick={() => setDeleteTarget(u)} className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 flex-shrink-0">
+              <button onClick={() => setDeleteTarget(u)} className="w-11 h-11 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 flex-shrink-0">
                 <Trash2 size={16} />
               </button>
             </div>

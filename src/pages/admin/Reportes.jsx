@@ -139,23 +139,23 @@ export default function Reportes() {
   return (
     <div className="p-4 sm:p-6">
       <h1 className="text-xl font-bold text-gray-800">Reportes</h1>
-      <p className="text-sm text-gray-700 mb-6 mt-0.5">Analiza los gastos de tu equipo por categoría y empleado en el periodo que elijas, y descárgalo en Excel o PDF.</p>
+      <p className="text-base text-gray-700 mb-6 mt-0.5">Analiza los gastos de tu equipo por categoría y empleado en el periodo que elijas, y descárgalo en Excel o PDF.</p>
 
       {/* Filtros */}
       <div className="bg-white rounded-xl border border-black shadow-sm p-4 mb-4">
         <div className="flex flex-wrap gap-3 items-end">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Desde</label>
-            <input type="date" value={desde} onChange={e => setDesde(e.target.value)} className="border border-gray-300 rounded px-2 py-1.5 text-sm" />
+            <label className="block text-base text-gray-700 mb-1">Desde</label>
+            <input type="date" value={desde} onChange={e => setDesde(e.target.value)} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Hasta</label>
-            <input type="date" value={hasta} onChange={e => setHasta(e.target.value)} className="border border-gray-300 rounded px-2 py-1.5 text-sm" />
+            <label className="block text-base text-gray-700 mb-1">Hasta</label>
+            <input type="date" value={hasta} onChange={e => setHasta(e.target.value)} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
           <button
             onClick={generarReporte}
             disabled={cargando}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="min-h-11 py-2 inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-base font-medium px-4 rounded-xl transition-colors"
           >
             {cargando ? 'Generando...' : 'Generar reporte'}
           </button>
@@ -166,12 +166,12 @@ export default function Reportes() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
         {[
           { label: 'Total de Gastos', value: `$${Number(totales.monto_total).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: 'text-gray-800' },
-          { label: 'Total Aprobado', value: `$${Number(totales.monto_aprobado).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: 'text-green-600' },
+          { label: 'Total Aprobado', value: `$${Number(totales.monto_aprobado).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: 'text-green-700' },
           { label: 'Total Rechazado', value: `$${Number(totales.monto_rechazado).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: 'text-red-600' },
-          { label: 'Total Pendiente', value: `$${Number(totales.monto_pendiente).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: 'text-yellow-600' },
+          { label: 'Total Pendiente', value: `$${Number(totales.monto_pendiente).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: 'text-yellow-700' },
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-white rounded-xl border border-black shadow-sm p-3 sm:p-4">
-            <p className="text-sm text-gray-700 mb-1">{label}</p>
+            <p className="text-base text-gray-700 mb-1">{label}</p>
             <p className={`text-lg sm:text-xl font-bold ${color}`}>{value}</p>
           </div>
         ))}
@@ -180,7 +180,7 @@ export default function Reportes() {
       {/* Charts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div className="bg-white rounded-xl border border-black shadow-sm p-4">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">Gastos por categoría</h2>
+          <h2 className="text-base font-semibold text-gray-700 mb-4">Gastos por categoría</h2>
           {pieData.length > 0 ? (
             <div className="flex items-center gap-4">
               <ResponsiveContainer width={140} height={140}>
@@ -191,7 +191,7 @@ export default function Reportes() {
                   <Tooltip formatter={(v) => `$${Number(v).toLocaleString()}`} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-1.5 text-sm">
+              <div className="space-y-1.5 text-base">
                 {pieData.map(({ name, value }, i) => (
                   <div key={name} className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: pieColors[i % pieColors.length] }} />
@@ -202,23 +202,23 @@ export default function Reportes() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-600 text-center py-8">Sin datos en este período</p>
+            <p className="text-base text-gray-600 text-center py-8">Sin datos en este período</p>
           )}
         </div>
 
         <div className="bg-white rounded-xl border border-black shadow-sm p-4">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">Top 5 empleados</h2>
+          <h2 className="text-base font-semibold text-gray-700 mb-4">Top 5 empleados</h2>
           {barData.length > 0 ? (
             <ResponsiveContainer width="100%" height={160}>
               <BarChart data={barData} layout="vertical" barSize={14}>
                 <XAxis type="number" hide />
-                <YAxis type="category" dataKey="nombre" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
+                <YAxis type="category" dataKey="nombre" tick={{ fontSize: 16 }} axisLine={false} tickLine={false} width={90} />
                 <Tooltip formatter={(v) => `$${Number(v).toLocaleString()}`} />
                 <Bar dataKey="monto" fill="#3b82f6" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-gray-600 text-center py-8">Sin datos en este período</p>
+            <p className="text-base text-gray-600 text-center py-8">Sin datos en este período</p>
           )}
         </div>
       </div>
@@ -227,14 +227,14 @@ export default function Reportes() {
         <button
           onClick={descargarExcel}
           disabled={descargando}
-          className="flex items-center justify-center gap-2 border border-green-500 text-green-600 font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-green-50 disabled:opacity-50 transition-colors"
+          className="min-h-11 py-2 flex items-center justify-center gap-2 border border-green-600 text-green-700 font-medium px-5 rounded-xl text-base hover:bg-green-50 disabled:opacity-50 transition-colors"
         >
           <Download size={16} /> Descargar Excel
         </button>
         <button
           onClick={descargarPDF}
           disabled={descargando}
-          className="flex items-center justify-center gap-2 border border-blue-500 text-blue-600 font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-blue-50 disabled:opacity-50 transition-colors"
+          className="min-h-11 py-2 flex items-center justify-center gap-2 border border-blue-500 text-blue-600 font-medium px-5 rounded-xl text-base hover:bg-blue-50 disabled:opacity-50 transition-colors"
         >
           <Download size={16} /> Descargar PDF
         </button>

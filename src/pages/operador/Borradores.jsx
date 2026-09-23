@@ -36,10 +36,10 @@ export default function Borradores() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900">Borradores</h1>
-          <p className="text-sm text-gray-700">{borradores.length} borrador{borradores.length !== 1 ? 'es' : ''} guardado{borradores.length !== 1 ? 's' : ''}</p>
+          <p className="text-base text-gray-700">{borradores.length} borrador{borradores.length !== 1 ? 'es' : ''} guardado{borradores.length !== 1 ? 's' : ''}</p>
         </div>
       </div>
-      <p className="text-sm text-gray-700 -mt-2 mb-5">Un borrador no se envía a revisión hasta que le das clic a "Continuar editando" y lo completas. También puedes eliminarlo si ya no lo necesitas.</p>
+      <p className="text-base text-gray-700 -mt-2 mb-5">Un borrador no se envía a revisión hasta que le das clic a "Continuar editando" y lo completas. También puedes eliminarlo si ya no lo necesitas.</p>
 
       <ConfirmModal
         open={!!confirmId}
@@ -55,7 +55,7 @@ export default function Borradores() {
         <div className="bg-white rounded-2xl border border-black shadow-sm p-8 flex flex-col items-center text-center gap-3">
           <BookMarked size={40} className="text-gray-300" />
           <p className="text-base font-semibold text-gray-700">No tienes borradores guardados</p>
-          <p className="text-sm text-gray-600">Cuando guardes un gasto como borrador aparecerá aquí.</p>
+          <p className="text-base text-gray-600">Cuando guardes un gasto como borrador aparecerá aquí.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -68,18 +68,18 @@ export default function Borradores() {
                       <span className="text-lg font-bold text-gray-900">{b.moneda} ${Number(b.monto).toFixed(2)}</span>
                     )}
                     {b.categoria && (
-                      <span className="text-sm bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full">{b.categoria}</span>
+                      <span className="text-base bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full">{b.categoria}</span>
                     )}
                   </div>
-                  {b.descripcion && <p className="text-sm text-gray-600 mb-1">{b.descripcion}</p>}
-                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
+                  {b.descripcion && <p className="text-base text-gray-600 mb-1">{b.descripcion}</p>}
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-base text-gray-600">
                     {b.fecha && <span>📅 {formatDate(b.fecha)}</span>}
                     {b.ubicacion && <span>📍 {b.ubicacion}</span>}
                     <span>💾 Guardado: {formatFecha(b.fecha_creacion)}</span>
                   </div>
                   {!b.foto_url && !b.factura_url && !b.factura_xml_url && (
-                    <div className="flex items-center gap-1 mt-2 text-sm text-yellow-600 bg-yellow-50 px-2 py-1 rounded-lg w-fit">
-                      <AlertCircle size={12} /> Sin documentos adjuntos
+                    <div className="flex items-center gap-1 mt-2 text-base text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg w-fit">
+                      <AlertCircle size={16} /> Sin documentos adjuntos
                     </div>
                   )}
                 </div>
@@ -87,13 +87,13 @@ export default function Borradores() {
               <div className="flex gap-2 pt-2 border-t border-gray-100">
                 <button
                   onClick={() => navigate(`/operador/nuevo-gasto/${b.id}`)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
+                  className="min-h-11 py-2 flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl text-base transition-colors"
                 >
-                  <Pencil size={15} /> Continuar editando
+                  <Pencil size={18} /> Continuar editando
                 </button>
                 <button
                   onClick={() => setConfirmId(b.id)}
-                  className="w-11 h-11 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-500 border-2 border-red-100 transition-colors flex-shrink-0"
+                  className="w-11 h-11 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 border-2 border-red-100 transition-colors flex-shrink-0"
                 >
                   <Trash2 size={17} />
                 </button>

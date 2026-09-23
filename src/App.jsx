@@ -38,9 +38,9 @@ export default function App() {
                     {t.type !== 'loading' && (
                       <button
                         onClick={() => toast.dismiss(t.id)}
-                        className="ml-1 flex-shrink-0 text-gray-400 hover:text-gray-700 transition-colors"
+                        className="ml-1 flex-shrink-0 text-gray-600 hover:text-gray-700 transition-colors"
                       >
-                        <X size={14} />
+                        <X size={16} />
                       </button>
                     )}
                     {t.type !== 'loading' && (

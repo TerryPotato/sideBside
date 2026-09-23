@@ -26,8 +26,8 @@ export default function DetalleGasto() {
 
   return (
     <div className="p-4 sm:p-6">
-      <Link to="/admin/gastos-pendientes" className="flex items-center gap-1 text-blue-500 hover:underline text-sm mb-4">
-        <ArrowLeft size={14} /> Volver
+      <Link to="/admin/gastos-pendientes" className="flex items-center gap-1 text-blue-600 hover:underline text-base mb-4">
+        <ArrowLeft size={16} /> Volver
       </Link>
 
       <h1 className="text-xl font-bold text-gray-800 mb-6">Detalle del Gasto</h1>
@@ -39,7 +39,7 @@ export default function DetalleGasto() {
           ? 'El empleado recibirá una notificación de aprobación.'
           : 'El empleado recibirá el motivo de rechazo indicado.'}
         confirmLabel={modal.tipo === 'aprobar' ? 'Sí, aprobar' : 'Sí, rechazar'}
-        confirmClass={modal.tipo === 'aprobar' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
+        confirmClass={modal.tipo === 'aprobar' ? 'bg-green-700 hover:bg-green-800' : 'bg-red-600 hover:bg-red-700'}
         onConfirm={confirmar}
         onCancel={() => setModal({ open: false, tipo: null })}
       />
@@ -52,37 +52,37 @@ export default function DetalleGasto() {
           <Row label="Monto" value="$800.00" bold />
           <Row label="Fecha" value="13/05/2024  09:15 a.m." />
           <div>
-            <p className="text-xs text-gray-400 mb-0.5">Ubicación</p>
-            <div className="flex items-center gap-1 text-sm text-gray-700">
-              <MapPin size={14} className="text-gray-400" /> Querétaro, Qro.
+            <p className="text-base text-gray-600 mb-0.5">Ubicación</p>
+            <div className="flex items-center gap-1 text-base text-gray-700">
+              <MapPin size={16} className="text-gray-600" /> Querétaro, Qro.
             </div>
           </div>
           <div>
-            <p className="text-xs text-gray-400 mb-0.5">Estado</p>
-            <span className="px-2 py-0.5 rounded-full text-xs font-medium text-yellow-600 bg-yellow-50">Pendiente</span>
+            <p className="text-base text-gray-600 mb-0.5">Estado</p>
+            <span className="px-2 py-0.5 rounded-full text-base font-medium text-yellow-700 bg-yellow-50">Pendiente</span>
           </div>
 
           <div>
-            <p className="text-xs text-gray-400 mb-1">Comentario al rechazar</p>
+            <p className="text-base text-gray-600 mb-1">Comentario al rechazar</p>
             <textarea
               placeholder="Escribe el motivo del rechazo..."
               value={comentario}
               onChange={e => setComentario(e.target.value)}
               rows={3}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
             />
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => setModal({ open: true, tipo: 'aprobar' })}
-              className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
+              className="min-h-11 py-2 flex-1 flex items-center justify-center gap-2 bg-green-700 hover:bg-green-800 text-white font-medium rounded-xl text-base transition-colors"
             >
               <Check size={16} /> Aprobar gasto
             </button>
             <button
               onClick={() => setModal({ open: true, tipo: 'rechazar' })}
-              className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
+              className="min-h-11 py-2 flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl text-base transition-colors"
             >
               <X size={16} /> Rechazar gasto
             </button>
@@ -90,8 +90,8 @@ export default function DetalleGasto() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">Comprobante</h2>
-          <div className="bg-gray-100 rounded-lg h-52 sm:h-64 flex items-center justify-center text-gray-400 text-sm">
+          <h2 className="text-base font-semibold text-gray-700 mb-4">Comprobante</h2>
+          <div className="bg-gray-100 rounded-lg h-52 sm:h-64 flex items-center justify-center text-gray-600 text-base">
             Vista previa del comprobante
           </div>
         </div>
@@ -103,8 +103,8 @@ export default function DetalleGasto() {
 function Row({ label, value, bold }) {
   return (
     <div>
-      <p className="text-xs text-gray-400 mb-0.5">{label}</p>
-      <p className={`text-sm ${bold ? 'font-bold text-gray-800' : 'text-gray-700'}`}>{value}</p>
+      <p className="text-base text-gray-600 mb-0.5">{label}</p>
+      <p className={`text-base ${bold ? 'font-bold text-gray-800' : 'text-gray-700'}`}>{value}</p>
     </div>
   )
 }

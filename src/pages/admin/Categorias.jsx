@@ -24,7 +24,7 @@ function IconoPicker({ seleccionado, onChange }) {
         const activo = seleccionado === nombre
         return (
           <button key={nombre} type="button" onClick={() => onChange(nombre)}
-            className={`w-10 h-10 flex items-center justify-center rounded-xl border-2 transition-all ${activo ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-700 hover:border-gray-300'}`}>
+            className={`w-11 h-11 flex items-center justify-center rounded-xl border-2 transition-all ${activo ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-700 hover:border-gray-300'}`}>
             <Icono size={18} />
           </button>
         )
@@ -42,11 +42,11 @@ function CategoriaCard({ cat, onEdit, onDelete }) {
         <Icono size={20} style={{ color: cat.color }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-gray-900 text-sm">{cat.nombre}</p>
-        <p className="text-sm text-gray-700 truncate">{cat.descripcion}</p>
+        <p className="font-semibold text-gray-900 text-base">{cat.nombre}</p>
+        <p className="text-base text-gray-700 truncate">{cat.descripcion}</p>
       </div>
-      <IconButton icon={Pencil} label={`Editar ${cat.nombre}`} onClick={() => onEdit(cat)} iconSize={15} rounded="rounded-xl" />
-      <IconButton icon={Trash2} label={`Eliminar ${cat.nombre}`} onClick={() => onDelete(cat)} variant="danger" iconSize={15} rounded="rounded-xl" />
+      <IconButton icon={Pencil} label={`Editar ${cat.nombre}`} onClick={() => onEdit(cat)} iconSize={18} />
+      <IconButton icon={Trash2} label={`Eliminar ${cat.nombre}`} onClick={() => onDelete(cat)} variant="danger" iconSize={18} />
     </div>
   )
 }
@@ -120,9 +120,9 @@ export default function Categorias() {
       <div className="flex items-start justify-between mb-5 gap-2">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Categorías</h1>
-          <p className="text-sm text-gray-700 mt-0.5">Administra las categorías disponibles para clasificar los gastos. Da clic en una para editarla o desactivarla.</p>
+          <p className="text-base text-gray-700 mt-0.5">Administra las categorías disponibles para clasificar los gastos. Da clic en una para editarla o desactivarla.</p>
         </div>
-        <button onClick={abrirNueva} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors shadow-sm flex-shrink-0">
+        <button onClick={abrirNueva} className="min-h-11 py-2 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 rounded-xl text-base transition-colors shadow-sm flex-shrink-0">
           <Plus size={16} /> Nueva
         </button>
       </div>
@@ -142,16 +142,16 @@ export default function Categorias() {
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${tab === t.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-800'}`}
+            className={`px-4 py-2.5 text-base font-semibold border-b-2 transition-colors ${tab === t.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-800'}`}
           >
-            {t.label} <span className="ml-1 text-sm font-normal text-gray-700">({t.items.length})</span>
+            {t.label} <span className="ml-1 text-base font-normal text-gray-700">({t.items.length})</span>
           </button>
         ))}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {visibles.length === 0 ? (
-          <p className="text-sm text-gray-700 py-6 text-center col-span-full">
+          <p className="text-base text-gray-700 py-6 text-center col-span-full">
             {tab === 'activas' ? 'No hay categorías activas' : 'No hay categorías inactivas'}
           </p>
         ) : (
@@ -177,38 +177,38 @@ export default function Categorias() {
                   <Icono size={20} style={{ color: form.color }} />
                 </div>
               )})()}
-              <p className="font-semibold text-gray-800 text-sm">{form.nombre || 'Nueva categoría'}</p>
+              <p className="font-semibold text-gray-800 text-base">{form.nombre || 'Nueva categoría'}</p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="flex items-center text-sm font-bold text-gray-600 mb-1.5">Nombre<FieldHint text="El nombre de la categoría, tal como aparecerá al seleccionar un gasto." /></label>
+                <label className="flex items-center text-base font-bold text-gray-600 mb-1.5">Nombre<FieldHint text="El nombre de la categoría, tal como aparecerá al seleccionar un gasto." /></label>
                 <input value={form.nombre} onChange={e => set('nombre', e.target.value)}
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" placeholder="Ej. Combustible" />
+                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" placeholder="Ej. Combustible" />
               </div>
               <div>
-                <label className="flex items-center text-sm font-bold text-gray-600 mb-1.5">Descripción<FieldHint text="Un texto opcional que ayude a distinguir esta categoría de otras parecidas." /></label>
+                <label className="flex items-center text-base font-bold text-gray-600 mb-1.5">Descripción<FieldHint text="Un texto opcional que ayude a distinguir esta categoría de otras parecidas." /></label>
                 <input value={form.descripcion} onChange={e => set('descripcion', e.target.value)}
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" placeholder="Breve descripción" />
+                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" placeholder="Breve descripción" />
               </div>
               <div>
-                <label className="flex items-center text-sm font-bold text-gray-600 mb-2">Icono<FieldHint text="El ícono que representará esta categoría en toda la plataforma." /></label>
+                <label className="flex items-center text-base font-bold text-gray-600 mb-2">Icono<FieldHint text="El ícono que representará esta categoría en toda la plataforma." /></label>
                 <IconoPicker seleccionado={form.icono} onChange={v => set('icono', v)} />
               </div>
               <div>
-                <label className="flex items-center text-sm font-bold text-gray-600 mb-2">Color<FieldHint text="El color que identificará esta categoría en gráficas y etiquetas." /></label>
+                <label className="flex items-center text-base font-bold text-gray-600 mb-2">Color<FieldHint text="El color que identificará esta categoría en gráficas y etiquetas." /></label>
                 <div className="flex items-center gap-2 flex-wrap">
                   {COLORES.map(c => (
                     <button key={c} type="button" onClick={() => set('color', c)}
                       className="relative w-8 h-8 rounded-full transition-transform hover:scale-110 active:scale-95 focus:outline-none"
                       style={{ backgroundColor: c }}>
-                      {form.color === c && <Check size={14} className="absolute inset-0 m-auto text-white" />}
+                      {form.color === c && <Check size={16} className="absolute inset-0 m-auto text-white" />}
                     </button>
                   ))}
                   <div className="relative w-8 h-8 rounded-full flex-shrink-0 hover:scale-110 active:scale-95 transition-transform"
                     style={{ background: 'conic-gradient(from 0deg, #ef4444, #f59e0b, #eab308, #22c55e, #06b6d4, #3b82f6, #a855f7, #ec4899, #ef4444)' }}>
                     <div className="absolute inset-[2px] rounded-full bg-white flex items-center justify-center pointer-events-none">
-                      <Pipette size={12} className="text-gray-600" />
+                      <Pipette size={16} className="text-gray-600" />
                     </div>
                     <input type="color" value={form.color} onChange={e => set('color', e.target.value)}
                       title="Color personalizado"
@@ -218,9 +218,9 @@ export default function Categorias() {
               </div>
               {editando && (
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                  <span className="text-sm text-gray-700 flex-1">Estado: <span className="font-semibold">{form.activo ? 'Activa' : 'Inactiva'}</span></span>
+                  <span className="text-base text-gray-700 flex-1">Estado: <span className="font-semibold">{form.activo ? 'Activa' : 'Inactiva'}</span></span>
                   <button type="button" onClick={() => set('activo', !form.activo)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-colors ${form.activo ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                    className={`min-h-11 py-2 inline-flex items-center justify-center px-3 rounded-xl text-base font-bold transition-colors ${form.activo ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-800 hover:bg-green-200'}`}>
                     {form.activo ? 'Desactivar' : 'Activar'}
                   </button>
                 </div>
@@ -229,7 +229,7 @@ export default function Categorias() {
             </div>
 
             <div className="p-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
-              <button onClick={handleGuardar} className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 rounded-xl text-sm transition-colors">
+              <button onClick={handleGuardar} className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl text-base transition-colors">
                 {editando ? 'Guardar cambios' : 'Crear categoría'}
               </button>
             </div>

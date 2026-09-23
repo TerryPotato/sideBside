@@ -12,7 +12,7 @@ import * as gastosApi from '../../api/gastos'
 import { getFacturaBlobUrl, getFacturaXmlBlobUrl } from '../../api/client'
 
 const estadoBadge = {
-  Aprobado: 'text-green-700 bg-green-100',
+  Aprobado: 'text-green-800 bg-green-100',
   Pendiente: 'text-yellow-700 bg-yellow-100',
   Rechazado: 'text-red-700 bg-red-100',
 }
@@ -43,8 +43,8 @@ function DetalleModal({ gastoBasico, viaje, onClose }) {
   }, [gastoBasico.id])
 
   const estadoBadge = {
-    Aprobado: 'text-green-600 bg-green-50',
-    Pendiente: 'text-yellow-600 bg-yellow-50',
+    Aprobado: 'text-green-700 bg-green-50',
+    Pendiente: 'text-yellow-700 bg-yellow-50',
     Rechazado: 'text-red-600 bg-red-50',
   }
   return (
@@ -64,7 +64,7 @@ function DetalleModal({ gastoBasico, viaje, onClose }) {
           ) : (
             <div className="flex flex-col items-center gap-2 text-gray-700">
               <ImageOff size={32} className="opacity-40" />
-              <p className="text-sm opacity-50">Sin comprobante</p>
+              <p className="text-base">Sin comprobante</p>
             </div>
           )}
         </div>
@@ -73,15 +73,15 @@ function DetalleModal({ gastoBasico, viaje, onClose }) {
         <div className="p-5 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-gray-900">${gasto.monto?.toFixed(2)}</span>
-            <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[gasto.estado]}`}>{gasto.estado}</span>
+            <span className={`px-2 py-0.5 rounded-full text-base font-medium ${estadoBadge[gasto.estado]}`}>{gasto.estado}</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            {gasto.iva > 0 && <Row icon={<DollarSign size={13} />} label="IVA" value={`$${gasto.iva.toFixed(2)}`} />}
-            <Row icon={<Tag size={13} />} label="Categoría" value={gasto.categoria} />
-            <Row icon={<Calendar size={13} />} label="Fecha" value={formatDate(gasto.fecha)} />
-            <Row icon={<DollarSign size={13} />} label="Empleado" value={gasto.empleado} />
-            {gasto.ubicacion && <Row icon={<MapPin size={13} />} label="Ubicación" value={gasto.ubicacion} />}
+          <div className="grid grid-cols-2 gap-3 text-base">
+            {gasto.iva > 0 && <Row icon={<DollarSign size={16} />} label="IVA" value={`$${gasto.iva.toFixed(2)}`} />}
+            <Row icon={<Tag size={16} />} label="Categoría" value={gasto.categoria} />
+            <Row icon={<Calendar size={16} />} label="Fecha" value={formatDate(gasto.fecha)} />
+            <Row icon={<DollarSign size={16} />} label="Empleado" value={gasto.empleado} />
+            {gasto.ubicacion && <Row icon={<MapPin size={16} />} label="Ubicación" value={gasto.ubicacion} />}
           </div>
 
           {(gasto.factura_url || gasto.factura_xml_url) && (
@@ -97,9 +97,9 @@ function DetalleModal({ gastoBasico, viaje, onClose }) {
                       toast.error(err.message)
                     }
                   }}
-                  className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-fit"
+                  className="flex items-center gap-2 text-base text-blue-600 hover:underline w-fit"
                 >
-                  <FileText size={14} /> Ver factura (PDF)
+                  <FileText size={16} /> Ver factura (PDF)
                 </button>
               )}
               {gasto.factura_xml_url && (
@@ -113,9 +113,9 @@ function DetalleModal({ gastoBasico, viaje, onClose }) {
                       toast.error(err.message)
                     }
                   }}
-                  className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-fit"
+                  className="flex items-center gap-2 text-base text-blue-600 hover:underline w-fit"
                 >
-                  <FileText size={14} /> Ver factura (XML)
+                  <FileText size={16} /> Ver factura (XML)
                 </button>
               )}
             </div>
@@ -123,24 +123,24 @@ function DetalleModal({ gastoBasico, viaje, onClose }) {
 
           {gasto.descripcion && (
             <div>
-              <p className="text-sm text-gray-600 mb-1">Descripción</p>
-              <p className="text-sm text-gray-700 bg-gray-50 rounded-lg px-3 py-2">{gasto.descripcion}</p>
+              <p className="text-base text-gray-600 mb-1">Descripción</p>
+              <p className="text-base text-gray-700 bg-gray-50 rounded-lg px-3 py-2">{gasto.descripcion}</p>
             </div>
           )}
 
           {viaje && (
             <div>
-              <p className="text-sm text-gray-600 mb-1">Viaje</p>
-              <p className="text-sm text-gray-700">{viaje.nombre}</p>
+              <p className="text-base text-gray-600 mb-1">Viaje</p>
+              <p className="text-base text-gray-700">{viaje.nombre}</p>
             </div>
           )}
 
           {cargando ? (
-            <p className="flex items-center gap-2 text-sm text-gray-700"><Loader2 size={14} className="animate-spin" /> Cargando detalle...</p>
+            <p className="flex items-center gap-2 text-base text-gray-700"><Loader2 size={16} className="animate-spin" /> Cargando detalle...</p>
           ) : gasto.comentario && (
             <div>
-              <p className="text-sm text-gray-600 mb-1">Motivo de rechazo</p>
-              <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{gasto.comentario}</p>
+              <p className="text-base text-gray-600 mb-1">Motivo de rechazo</p>
+              <p className="text-base text-red-600 bg-red-50 rounded-lg px-3 py-2">{gasto.comentario}</p>
             </div>
           )}
         </div>
@@ -154,9 +154,9 @@ function Row({ icon, label, value }) {
     <div>
       <div className="flex items-center gap-1 text-gray-600 mb-0.5">
         {icon}
-        <span className="text-sm">{label}</span>
+        <span className="text-base">{label}</span>
       </div>
-      <p className="text-sm text-gray-700 font-medium">{value}</p>
+      <p className="text-base text-gray-700 font-medium">{value}</p>
     </div>
   )
 }
@@ -269,14 +269,14 @@ export default function TodosGastos() {
       <div className="flex items-start justify-between mb-6 gap-2">
         <div>
           <h1 className="text-xl font-bold text-gray-800">Todos los Gastos</h1>
-          <p className="text-sm text-gray-700 mt-0.5">Filtra y busca los gastos de todo tu equipo. Da clic en el ícono del ojo para ver el detalle completo de un gasto.</p>
+          <p className="text-base text-gray-700 mt-0.5">Filtra y busca los gastos de todo tu equipo. Da clic en el ícono del ojo para ver el detalle completo de un gasto.</p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
-          <button onClick={descargarExcel} aria-label="Descargar Excel" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
-            <FileSpreadsheet size={14} /><span className="hidden sm:inline">Excel</span>
+          <button onClick={descargarExcel} aria-label="Descargar Excel" className="min-h-11 py-2 flex items-center gap-1.5 border border-gray-300 text-gray-600 text-base px-3 rounded-xl hover:bg-gray-50">
+            <FileSpreadsheet size={16} /><span className="hidden sm:inline">Excel</span>
           </button>
-          <button onClick={descargarPDF} aria-label="Descargar PDF" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
-            <FileText size={14} /><span className="hidden sm:inline">PDF</span>
+          <button onClick={descargarPDF} aria-label="Descargar PDF" className="min-h-11 py-2 flex items-center gap-1.5 border border-gray-300 text-gray-600 text-base px-3 rounded-xl hover:bg-gray-50">
+            <FileText size={16} /><span className="hidden sm:inline">PDF</span>
           </button>
         </div>
       </div>
@@ -285,36 +285,36 @@ export default function TodosGastos() {
       <div className="bg-white rounded-xl border border-black shadow-sm p-4 mb-4">
         <div className="flex flex-wrap gap-3">
           <div className="flex flex-col gap-1 flex-1 min-w-[200px]">
-            <label className="text-sm text-gray-600">Buscar</label>
+            <label className="text-base text-gray-600">Buscar</label>
             <div className="relative">
-              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-700" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-700" />
               <input
                 type="text"
                 value={busqueda}
                 onChange={e => { setBusqueda(e.target.value); setPagina(1) }}
                 placeholder="Empleado o descripción..."
-                className="w-full border border-gray-300 rounded pl-7 pr-2 py-1 text-sm"
+                className="w-full border-2 border-gray-200 rounded-xl pl-10 pr-4 py-3 text-base focus:outline-none focus:border-blue-500"
               />
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-700">Fecha desde</label>
-            <input type="date" value={desde} onChange={e => { setDesde(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm" />
+            <label className="text-base text-gray-700">Fecha desde</label>
+            <input type="date" value={desde} onChange={e => { setDesde(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-700">Fecha hasta</label>
-            <input type="date" value={hasta} onChange={e => { setHasta(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm" />
+            <label className="text-base text-gray-700">Fecha hasta</label>
+            <input type="date" value={hasta} onChange={e => { setHasta(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-700">Categoría</label>
-            <select value={categoria} onChange={e => { setCategoria(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
+            <label className="text-base text-gray-700">Categoría</label>
+            <select value={categoria} onChange={e => { setCategoria(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 bg-white">
               <option>Todas</option>
               {categorias.map(c => <option key={c.id}>{c.nombre}</option>)}
             </select>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-700">Estado</label>
-            <select value={estado} onChange={e => { setEstado(e.target.value); setPagina(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
+            <label className="text-base text-gray-700">Estado</label>
+            <select value={estado} onChange={e => { setEstado(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 bg-white">
               <option>Todos</option>
               <option>Aprobado</option>
               <option>Pendiente</option>
@@ -331,9 +331,9 @@ export default function TodosGastos() {
           <>
             {/* Tabla desktop */}
             <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-base">
                 <thead>
-                  <tr className="text-left text-sm text-gray-600 border-b">
+                  <tr className="text-left text-base text-gray-600 border-b">
                     <th className="pb-2 pr-4 font-medium">Empleado</th>
                     <th className="pb-2 pr-4 font-medium">Viaje</th>
                     <th className="pb-2 pr-4 font-medium">Categoría</th>
@@ -354,18 +354,18 @@ export default function TodosGastos() {
                       <td className="py-2.5 pr-4 text-gray-700 whitespace-nowrap">{formatDate(g.fecha)}</td>
                       <td className="py-2.5 pr-4 font-medium text-gray-800 whitespace-nowrap">${g.monto.toFixed(2)}</td>
                       <td className="py-2.5 pr-4">
-                        <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-base font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
                       </td>
                       <td className="py-2.5">
                         <div className="flex items-center gap-2">
-                          <IconButton icon={Eye} label="Ver detalle" onClick={() => setGastoDetalle(g)} variant="success" size="sm" rounded="rounded-lg" iconSize={14} />
+                          <IconButton icon={Eye} label="Ver detalle" onClick={() => setGastoDetalle(g)} variant="success" size="sm" iconSize={18} />
                           {g.estado === 'Pendiente' && (
                             <button
                               onClick={() => abrirAprobacion(g)}
-                              className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-2.5 py-1.5 rounded transition-colors"
+                              className="min-h-11 py-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium px-2.5 rounded-xl transition-colors"
                               title="Revisar gasto"
                             >
-                              <ClipboardCheck size={13} /> Revisar
+                              <ClipboardCheck size={16} /> Revisar
                             </button>
                           )}
                         </div>
@@ -382,23 +382,23 @@ export default function TodosGastos() {
                 <div key={g.id} className={`rounded-xl p-3 border transition-colors ${g.estado === 'Aprobado' ? 'bg-green-50 border-green-200' : g.estado === 'Rechazado' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'}`}>
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <div>
-                      <p className="text-sm font-medium text-gray-800">{g.empleado}</p>
-                      <p className="text-sm text-gray-700">{g.descripcion} · {g.categoria}</p>
+                      <p className="text-base font-medium text-gray-800">{g.empleado}</p>
+                      <p className="text-base text-gray-700">{g.descripcion} · {g.categoria}</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-base font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-2 gap-2">
-                    <span className="text-sm text-gray-600">{formatDate(g.fecha)} · ${g.monto.toFixed(2)}</span>
+                    <span className="text-base text-gray-600">{formatDate(g.fecha)} · ${g.monto.toFixed(2)}</span>
                     <div className="flex gap-2">
-                      <IconButton icon={Eye} label="Ver detalle" onClick={() => setGastoDetalle(g)} variant="success" rounded="rounded-lg" iconSize={14} />
+                      <IconButton icon={Eye} label="Ver detalle" onClick={() => setGastoDetalle(g)} variant="success" iconSize={18} />
                       {g.estado === 'Pendiente' && (
                         <button
                           onClick={() => abrirAprobacion(g)}
-                          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-2.5 py-1.5 rounded transition-colors"
+                          className="min-h-11 py-2 flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium px-2.5 rounded-xl transition-colors"
                         >
-                          <ClipboardCheck size={13} /> Revisar
+                          <ClipboardCheck size={16} /> Revisar
                         </button>
                       )}
                     </div>
@@ -410,13 +410,13 @@ export default function TodosGastos() {
             {/* Paginación */}
             {totalPaginas > 1 && (
               <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-gray-600">{filtrados.length} resultados</p>
+                <p className="text-base text-gray-600">{filtrados.length} resultados</p>
                 <div className="flex items-center gap-1">
-                  <IconButton icon={ChevronLeft} label="Página anterior" onClick={() => cambiarPagina(pagina - 1)} disabled={pagina === 1} size="sm" rounded="rounded" iconSize={16} />
+                  <IconButton icon={ChevronLeft} label="Página anterior" onClick={() => cambiarPagina(pagina - 1)} disabled={pagina === 1} size="sm" iconSize={16} />
                   {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(n => (
-                    <button key={n} onClick={() => cambiarPagina(n)} className={`w-7 h-7 rounded text-sm ${n === pagina ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{n}</button>
+                    <button key={n} onClick={() => cambiarPagina(n)} className={`w-11 h-11 inline-flex items-center justify-center rounded-xl text-base ${n === pagina ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{n}</button>
                   ))}
-                  <IconButton icon={ChevronRight} label="Página siguiente" onClick={() => cambiarPagina(pagina + 1)} disabled={pagina === totalPaginas} size="sm" rounded="rounded" iconSize={16} />
+                  <IconButton icon={ChevronRight} label="Página siguiente" onClick={() => cambiarPagina(pagina + 1)} disabled={pagina === totalPaginas} size="sm" iconSize={16} />
                 </div>
               </div>
             )}

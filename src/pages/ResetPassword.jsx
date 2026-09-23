@@ -10,8 +10,8 @@ const CONTRASENA_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
 
 function Requisito({ ok, label }) {
   return (
-    <li className={`flex items-center gap-1.5 text-sm ${ok ? 'text-green-600' : 'text-gray-700'}`}>
-      {ok ? <CheckCircle2 size={14} /> : <XCircle size={14} />} {label}
+    <li className={`flex items-center gap-1.5 text-base ${ok ? 'text-green-700' : 'text-gray-700'}`}>
+      {ok ? <CheckCircle2 size={16} /> : <XCircle size={16} />} {label}
     </li>
   )
 }
@@ -53,28 +53,28 @@ export default function ResetPassword() {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">S</div>
+            <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">S</div>
             <span className="text-2xl font-bold text-[#1a2456]">SideBSide</span>
           </div>
         </div>
 
         {!token ? (
           <div className="text-center">
-            <p className="text-sm text-gray-700 mb-4">Este enlace no es válido o ya expiró. Solicita uno nuevo desde la pantalla de inicio de sesión.</p>
-            <Link to="/login" className="text-sm text-blue-600 hover:underline font-medium">Volver a iniciar sesión</Link>
+            <p className="text-base text-gray-700 mb-4">Este enlace no es válido o ya expiró. Solicita uno nuevo desde la pantalla de inicio de sesión.</p>
+            <Link to="/login" className="text-base text-blue-600 hover:underline font-medium">Volver a iniciar sesión</Link>
           </div>
         ) : (
           <>
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Nueva contraseña</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-700 mb-1">Nueva contraseña</label>
+                <label className="block text-base text-gray-700 mb-1">Nueva contraseña</label>
                 <div className="relative">
                   <input
                     type={verClave ? 'text' : 'password'}
                     value={nueva}
                     onChange={e => setNueva(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm pr-11 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base pr-11 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   />
                   <button type="button" onClick={() => setVerClave(v => !v)}
                     className="absolute inset-y-0 right-0 w-11 flex items-center justify-center text-gray-600 hover:text-gray-800">
@@ -87,17 +87,17 @@ export default function ResetPassword() {
                 </ul>
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">Confirmar contraseña</label>
+                <label className="block text-base text-gray-700 mb-1">Confirmar contraseña</label>
                 <input
                   type={verClave ? 'text' : 'password'}
                   value={confirmar}
                   onChange={e => setConfirmar(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
-                {confirmar.length > 0 && !coinciden && <p className="text-sm text-red-500 mt-1">Las contraseñas no coinciden</p>}
+                {confirmar.length > 0 && !coinciden && <p className="text-base text-red-600 mt-1">Las contraseñas no coinciden</p>}
               </div>
               <button type="submit" disabled={enviando || !esValida || !coinciden}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors">
+                className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-xl text-base transition-colors">
                 {enviando ? 'Guardando...' : 'Restablecer contraseña'}
               </button>
             </form>

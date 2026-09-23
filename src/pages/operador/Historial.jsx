@@ -10,7 +10,7 @@ import { formatDate, formatDateRange } from '../../utils/date'
 import { exportExcel, exportPDF, todayStamp } from '../../utils/export'
 
 const estadoBadge = {
-  Aprobado: 'text-green-700 bg-green-100',
+  Aprobado: 'text-green-800 bg-green-100',
   Pendiente: 'text-yellow-700 bg-yellow-100',
   Rechazado: 'text-red-700 bg-red-100',
 }
@@ -84,14 +84,14 @@ export default function Historial() {
       <div className="flex items-start justify-between mb-6 gap-2">
         <div>
           <h1 className="text-xl font-bold text-gray-800">Historial de Gastos</h1>
-          <p className="text-sm text-gray-700 mt-0.5">Consulta tus gastos anteriores agrupados por viaje. Da clic en un viaje para ver el detalle de cada gasto.</p>
+          <p className="text-base text-gray-700 mt-0.5">Consulta tus gastos anteriores agrupados por viaje. Da clic en un viaje para ver el detalle de cada gasto.</p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
-          <button onClick={descargarExcel} aria-label="Descargar Excel" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
-            <FileSpreadsheet size={14} /><span className="hidden sm:inline">Excel</span>
+          <button onClick={descargarExcel} aria-label="Descargar Excel" className="min-h-11 py-2 flex items-center gap-1.5 border border-gray-300 text-gray-600 text-base px-3 rounded-xl hover:bg-gray-50">
+            <FileSpreadsheet size={16} /><span className="hidden sm:inline">Excel</span>
           </button>
-          <button onClick={descargarPDF} aria-label="Descargar PDF" className="flex items-center gap-1.5 border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
-            <FileText size={14} /><span className="hidden sm:inline">PDF</span>
+          <button onClick={descargarPDF} aria-label="Descargar PDF" className="min-h-11 py-2 flex items-center gap-1.5 border border-gray-300 text-gray-600 text-base px-3 rounded-xl hover:bg-gray-50">
+            <FileText size={16} /><span className="hidden sm:inline">PDF</span>
           </button>
         </div>
       </div>
@@ -112,19 +112,19 @@ export default function Historial() {
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <p className="text-sm font-semibold text-gray-800">{v.nombre}</p>
-                    <span className={`text-sm px-2 py-0.5 rounded-full font-medium ${v.estado === 'activo' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                    <p className="text-base font-semibold text-gray-800">{v.nombre}</p>
+                    <span className={`text-base px-2 py-0.5 rounded-full font-medium ${v.estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
                       {v.estado}
                     </span>
                     {pendientes > 0 && (
-                      <span className="text-sm px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-700">
+                      <span className="text-base px-2 py-0.5 rounded-full font-medium bg-yellow-100 text-yellow-700">
                         {pendientes} pendiente{pendientes !== 1 ? 's' : ''}
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 mb-2">
-                    <span className="flex items-center gap-1"><Calendar size={11} />{formatDateRange(v.fecha_inicio, v.fecha_fin)}</span>
-                    <span className="flex items-center gap-1"><DollarSign size={11} />Total: ${total.toFixed(2)}</span>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-base text-gray-600 mb-2">
+                    <span className="flex items-center gap-1"><Calendar size={16} />{formatDateRange(v.fecha_inicio, v.fecha_fin)}</span>
+                    <span className="flex items-center gap-1"><DollarSign size={16} />Total: ${total.toFixed(2)}</span>
                     <span>{gastos.length} gasto{gastos.length !== 1 ? 's' : ''}</span>
                   </div>
                   {v.presupuesto > 0 && (
@@ -142,14 +142,14 @@ export default function Historial() {
               {abierto && (
                 <div className="border-t">
                   {gastos.length === 0 ? (
-                    <p className="text-sm text-gray-600 text-center py-6">No hay gastos en este viaje</p>
+                    <p className="text-base text-gray-600 text-center py-6">No hay gastos en este viaje</p>
                   ) : (
                     <>
                       {/* Tabla desktop */}
                       <div className="hidden sm:block overflow-x-auto">
-                        <table className="w-full text-sm">
+                        <table className="w-full text-base">
                           <thead>
-                            <tr className="text-left text-sm text-gray-600 bg-gray-50 border-b">
+                            <tr className="text-left text-base text-gray-600 bg-gray-50 border-b">
                               <th className="px-5 py-2 font-medium">Fecha</th>
                               <th className="px-5 py-2 font-medium">Descripción</th>
                               <th className="px-5 py-2 font-medium">Categoría</th>
@@ -165,7 +165,7 @@ export default function Historial() {
                                 <td className="px-5 py-2.5 text-gray-700">{g.categoria}</td>
                                 <td className="px-5 py-2.5 font-medium text-gray-800">${g.monto.toFixed(2)}</td>
                                 <td className="px-5 py-2.5">
-                                  <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                                  <span className={`px-2 py-0.5 rounded-full text-base font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
                                 </td>
                               </tr>
                             ))}
@@ -178,19 +178,19 @@ export default function Historial() {
                         {gastos.map((g, i) => (
                           <div key={i} className={`p-4 flex items-start justify-between gap-2 transition-colors ${estadoFila[g.estado]}`}>
                             <div>
-                              <p className="text-sm font-medium text-gray-800">{g.descripcion}</p>
-                              <p className="text-sm text-gray-600 mt-0.5">{g.categoria} · {formatDate(g.fecha)}</p>
+                              <p className="text-base font-medium text-gray-800">{g.descripcion}</p>
+                              <p className="text-base text-gray-600 mt-0.5">{g.categoria} · {formatDate(g.fecha)}</p>
                             </div>
                             <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                              <span className="text-sm font-semibold text-gray-800">${g.monto.toFixed(2)}</span>
-                              <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
+                              <span className="text-base font-semibold text-gray-800">${g.monto.toFixed(2)}</span>
+                              <span className={`px-2 py-0.5 rounded-full text-base font-medium ${estadoBadge[g.estado]}`}>{g.estado}</span>
                             </div>
                           </div>
                         ))}
                       </div>
 
                       {/* Resumen pie */}
-                      <div className="px-5 py-3 bg-gray-50 border-t flex justify-end text-sm text-gray-700 gap-4">
+                      <div className="px-5 py-3 bg-gray-50 border-t flex justify-end text-base text-gray-700 gap-4">
                         <span>Total del viaje: <span className="font-semibold text-gray-800">${total.toFixed(2)}</span></span>
                       </div>
                     </>

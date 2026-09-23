@@ -31,9 +31,9 @@ function OlvideContrasena({ onBack }) {
           <Mail size={22} className="text-blue-600" />
         </div>
         <h2 className="text-base font-semibold text-gray-800 mb-2">Revisa tu correo</h2>
-        <p className="text-sm text-gray-600 mb-6">Si <span className="font-medium">{email}</span> tiene una cuenta, te enviamos un enlace para restablecer tu contraseña. Es válido por 1 hora.</p>
-        <button type="button" onClick={onBack} className="flex items-center gap-1 text-sm text-blue-600 hover:underline mx-auto font-medium">
-          <ArrowLeft size={14} /> Volver a iniciar sesión
+        <p className="text-base text-gray-600 mb-6">Si <span className="font-medium">{email}</span> tiene una cuenta, te enviamos un enlace para restablecer tu contraseña. Es válido por 1 hora.</p>
+        <button type="button" onClick={onBack} className="flex items-center gap-1 text-base text-blue-600 hover:underline mx-auto font-medium">
+          <ArrowLeft size={16} /> Volver a iniciar sesión
         </button>
       </div>
     )
@@ -41,13 +41,13 @@ function OlvideContrasena({ onBack }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <button type="button" onClick={onBack} className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800">
-        <ArrowLeft size={14} /> Volver
+      <button type="button" onClick={onBack} className="flex items-center gap-1 text-base text-gray-600 hover:text-gray-800">
+        <ArrowLeft size={16} /> Volver
       </button>
       <div>
         <h2 className="text-lg font-semibold text-gray-800 mb-1">Recuperar contraseña</h2>
-        <p className="text-sm text-gray-600 mb-4">Ingresa tu correo y te mandamos un enlace para restablecerla.</p>
-        <label htmlFor="recuperar-email" className="block text-sm text-gray-700 mb-1">Correo electrónico</label>
+        <p className="text-base text-gray-600 mb-4">Ingresa tu correo y te mandamos un enlace para restablecerla.</p>
+        <label htmlFor="recuperar-email" className="block text-base text-gray-700 mb-1">Correo electrónico</label>
         <input
           id="recuperar-email"
           type="email"
@@ -55,10 +55,10 @@ function OlvideContrasena({ onBack }) {
           placeholder="usuario@ejemplo.com"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
-      <button type="submit" disabled={enviando} className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors">
+      <button type="submit" disabled={enviando} className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-xl text-base transition-colors">
         {enviando ? 'Enviando...' : 'Enviar enlace de recuperación'}
       </button>
     </form>
@@ -111,10 +111,10 @@ export default function Login() {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">S</div>
+            <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">S</div>
             <span className="text-2xl font-bold text-[#1a2456]">SideBSide</span>
           </div>
-          <p className="text-sm text-blue-500">Gestión de gastos operativos</p>
+          <p className="text-base text-blue-600">Gestión de gastos operativos</p>
         </div>
 
         {modo === 'olvide' ? (
@@ -125,7 +125,7 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <div>
-                <label htmlFor="email" className="block text-sm text-gray-700 mb-1">Correo electrónico</label>
+                <label htmlFor="email" className="block text-base text-gray-700 mb-1">Correo electrónico</label>
                 <input
                   id="email"
                   type="email"
@@ -135,13 +135,13 @@ export default function Login() {
                   onChange={e => set('email', e.target.value)}
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? 'email-error' : undefined}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.email ? 'border-red-400' : 'border-gray-300'}`}
+                  className={`w-full border-2 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.email ? 'border-red-400' : 'border-gray-300'}`}
                 />
-                {errors.email && <p id="email-error" className="text-sm text-red-500 mt-1">{errors.email}</p>}
+                {errors.email && <p id="email-error" className="text-base text-red-600 mt-1">{errors.email}</p>}
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm text-gray-700 mb-1">Contraseña</label>
+                <label htmlFor="password" className="block text-base text-gray-700 mb-1">Contraseña</label>
                 <div className="relative">
                   <input
                     id="password"
@@ -151,7 +151,7 @@ export default function Login() {
                     onChange={e => set('password', e.target.value)}
                     aria-invalid={!!errors.password}
                     aria-describedby={errors.password ? 'password-error' : undefined}
-                    className={`w-full border rounded-lg px-3 py-2 text-sm pr-11 focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.password ? 'border-red-400' : 'border-gray-300'}`}
+                    className={`w-full border-2 rounded-xl px-4 py-3 text-base pr-11 focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.password ? 'border-red-400' : 'border-gray-300'}`}
                   />
                   <button
                     type="button"
@@ -162,10 +162,10 @@ export default function Login() {
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {errors.password && <p id="password-error" className="text-sm text-red-500 mt-1">{errors.password}</p>}
+                {errors.password && <p id="password-error" className="text-base text-red-600 mt-1">{errors.password}</p>}
               </div>
 
-              <button type="submit" disabled={enviando} className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition-colors">
+              <button type="submit" disabled={enviando} className="min-h-12 py-2 inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-xl text-base transition-colors">
                 {enviando ? 'Ingresando...' : 'Iniciar sesión'}
               </button>
             </form>
@@ -174,7 +174,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setModo('olvide')}
-                className="text-sm text-blue-500 hover:underline"
+                className="text-base text-blue-600 hover:underline"
               >
                 Olvidé mi contraseña
               </button>
