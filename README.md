@@ -1,5 +1,18 @@
 # React + Vite
 
+## Pruebas E2E (Playwright)
+
+```bash
+npm run test:e2e          # corre todo sin ventana
+npx playwright test --ui  # modo visual, paso a paso
+```
+
+Levanta solo el backend (puerto 5001, base `sidebside_test` recreada desde cero)
+y el frontend (puerto 5174), asi que se puede correr con los servidores de
+desarrollo abiertos. Requiere `sidebside-backend/` como carpeta hermana con sus
+dependencias instaladas. Si algo falla, `npx playwright show-report` muestra
+captura y traza del paso que fallo.
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:

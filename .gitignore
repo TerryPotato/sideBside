@@ -25,3 +25,8 @@ dist-ssr
 
 # Variables de entorno locales (.env.example si se versiona)
 .env
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
