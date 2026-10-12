@@ -96,6 +96,13 @@ export function DataProvider({ children }) {
     await recargarViajes()
   }
 
+  // El backend solo deja borrar viajes sin gastos; si tiene, responde 409 y
+  // el mensaje sugiere cancelarlo (actualizarViaje con estado 'cancelado').
+  async function eliminarViaje(id) {
+    await viajesApi.eliminar(id)
+    await recargarViajes()
+  }
+
   async function agregarGasto(gasto) {
     const categoriaObj = categorias.find(c => c.nombre === gasto.categoria)
     if (!categoriaObj) throw new Error('Selecciona una categoria valida')
@@ -247,7 +254,7 @@ export function DataProvider({ children }) {
   return (
     <DataContext.Provider value={{
       viajes, gastos, categorias, usuariosList, borradores, notificaciones,
-      crearViaje, actualizarViaje, agregarGasto, actualizarGasto, aprobarGasto, rechazarGasto,
+      crearViaje, actualizarViaje, eliminarViaje, agregarGasto, actualizarGasto, aprobarGasto, rechazarGasto,
       gastosDeViaje, viajesActivosDeUsuario,
       eliminarBorrador,
       actualizarCategoria, crearCategoria, eliminarCategoria,

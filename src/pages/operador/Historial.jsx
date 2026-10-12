@@ -113,7 +113,7 @@ export default function Historial() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <p className="text-base font-semibold text-gray-800">{v.nombre}</p>
-                    <span className={`text-base px-2 py-0.5 rounded-full font-medium ${v.estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
+                    <span className={`text-base px-2 py-0.5 rounded-full font-medium ${v.estado === 'activo' ? 'bg-green-100 text-green-800' : v.estado === 'cancelado' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}`}>
                       {v.estado}
                     </span>
                     {pendientes > 0 && (

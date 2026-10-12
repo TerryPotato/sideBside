@@ -11,3 +11,7 @@ export function crear(data) {
 export function actualizar(id, cambios) {
   return api.put(`/viajes/${id}`, cambios)
 }
+
+export function eliminar(id) {
+  return api.del(`/viajes/${id}`)
+}

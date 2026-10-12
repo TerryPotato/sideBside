@@ -1,4 +1,4 @@
-export default function ConfirmModal({ open, title, message, confirmLabel, confirmClass, onConfirm, onCancel }) {
+export default function ConfirmModal({ open, title, message, confirmLabel, confirmClass, onConfirm, onCancel, cancelLabel = 'Cancelar' }) {
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -11,7 +11,7 @@ export default function ConfirmModal({ open, title, message, confirmLabel, confi
             onClick={onCancel}
             className="min-h-11 py-2 flex-1 border border-gray-300 text-gray-700 font-medium rounded-xl text-base hover:bg-gray-50 transition-colors"
           >
-            Cancelar
+            {cancelLabel}
           </button>
           <button
             onClick={onConfirm}

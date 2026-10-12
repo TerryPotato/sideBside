@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, X, MapPin, Calendar, User, Pencil, CheckCircle2 } from 'lucide-react'
+import { Plus, X, MapPin, Calendar, User, Pencil, CheckCircle2, Trash2, Ban } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useData } from '../../context/DataContext'
 import AprobacionModal from '../../components/AprobacionModal'
@@ -12,16 +12,20 @@ import { formatDateRange } from '../../utils/date'
 const estadoChip = {
   activo: 'bg-green-100 text-green-800',
   completado: 'bg-gray-100 text-gray-600',
+  cancelado: 'bg-red-100 text-red-700',
 }
 
 const formVacio = { nombre: '', usuario_id: '', fecha_inicio: '', fecha_fin: '', presupuesto: '' }
 
 export default function Viajes() {
-  const { viajes, usuariosList: usuarios, crearViaje, actualizarViaje, gastosDeViaje } = useData()
+  const { viajes, usuariosList: usuarios, crearViaje, actualizarViaje, eliminarViaje, gastosDeViaje } = useData()
   const [showForm, setShowForm] = useState(false)
   const [viajeModal, setViajeModal] = useState(null)
   const [viajeEditando, setViajeEditando] = useState(null)
   const [viajeCompletando, setViajeCompletando] = useState(null)
+  const [viajeEliminando, setViajeEliminando] = useState(null)
+  const [viajeCancelando, setViajeCancelando] = useState(null)
+  const [guardando, setGuardando] = useState(false)
   const [form, setForm] = useState(formVacio)
   const [errors, setErrors] = useState({})
 
@@ -53,6 +57,9 @@ export default function Viajes() {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
+    // Sin esto cada clic mientras el servidor responde creaba otro viaje igual.
+    if (guardando) return
+    setGuardando(true)
     try {
       if (viajeEditando) {
         await actualizarViaje(viajeEditando.id, { nombre: form.nombre, fecha_inicio: form.fecha_inicio, fecha_fin: form.fecha_fin, presupuesto: Number(form.presupuesto) || 0 })
@@ -64,6 +71,8 @@ export default function Viajes() {
       cerrarForm()
     } catch (err) {
       toast.error(err.message)
+    } finally {
+      setGuardando(false)
     }
   }
 
@@ -73,6 +82,28 @@ export default function Viajes() {
     try {
       await actualizarViaje(viaje.id, { estado: 'completado' })
       toast.success('Viaje marcado como completado')
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }
+
+  async function handleEliminar() {
+    const viaje = viajeEliminando
+    setViajeEliminando(null)
+    try {
+      await eliminarViaje(viaje.id)
+      toast.success('Viaje eliminado')
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }
+
+  async function handleCancelar() {
+    const viaje = viajeCancelando
+    setViajeCancelando(null)
+    try {
+      await actualizarViaje(viaje.id, { estado: 'cancelado' })
+      toast.success('Viaje cancelado')
     } catch (err) {
       toast.error(err.message)
     }
@@ -111,6 +142,27 @@ export default function Viajes() {
         confirmClass="bg-green-700 hover:bg-green-800"
         onConfirm={handleCompletar}
         onCancel={() => setViajeCompletando(null)}
+      />
+
+      <ConfirmModal
+        open={!!viajeEliminando}
+        title="¿Eliminar este viaje?"
+        message={`"${viajeEliminando?.nombre}" se borrará por completo. Úsalo para viajes creados por error; no se puede deshacer.`}
+        confirmLabel="Sí, eliminar"
+        confirmClass="bg-red-600 hover:bg-red-700"
+        onConfirm={handleEliminar}
+        onCancel={() => setViajeEliminando(null)}
+      />
+
+      <ConfirmModal
+        open={!!viajeCancelando}
+        title="¿Cancelar este viaje?"
+        message={`"${viajeCancelando?.nombre}" ya tiene gastos, así que no se puede borrar. Al cancelarlo se conservan esos gastos, pero el empleado ya no podrá registrar nuevos ni se podrá editar el viaje.`}
+        confirmLabel="Sí, cancelar viaje"
+        cancelLabel="Volver"
+        confirmClass="bg-red-600 hover:bg-red-700"
+        onConfirm={handleCancelar}
+        onCancel={() => setViajeCancelando(null)}
       />
 
       {/* Formulario nuevo viaje / edicion */}
@@ -180,7 +232,7 @@ export default function Viajes() {
             </div>
             <div className="flex gap-3 pt-1">
               <button type="button" onClick={cerrarForm} className="min-h-11 py-2 flex-1 border border-gray-300 text-gray-700 font-medium rounded-xl text-base hover:bg-gray-50">Cancelar</button>
-              <button type="submit" className="min-h-11 py-2 flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-base transition-colors">{viajeEditando ? 'Guardar cambios' : 'Crear viaje'}</button>
+              <button type="submit" disabled={guardando} className="min-h-11 py-2 flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium rounded-xl text-base transition-colors">{guardando ? 'Guardando...' : viajeEditando ? 'Guardar cambios' : 'Crear viaje'}</button>
             </div>
           </form>
         </div>
@@ -241,6 +293,27 @@ export default function Viajes() {
                         <CheckCircle2 size={16} /><span className="hidden sm:inline">Completar</span>
                       </button>
                     </>
+                  )}
+                  {/* Sin gastos se puede borrar (viaje creado por error); con
+                      gastos solo cancelar, para no perder ese registro. El
+                      backend vuelve a validar: el admin no ve los borradores. */}
+                  {v.estado !== 'cancelado' && gastos.length === 0 && (
+                    <button
+                      onClick={() => setViajeEliminando(v)}
+                      title="Eliminar viaje"
+                      className="min-h-11 py-2 flex items-center justify-center gap-1.5 border border-red-200 text-red-700 text-base font-medium px-3 rounded-xl hover:bg-red-50 transition-colors"
+                    >
+                      <Trash2 size={16} /><span className="hidden sm:inline">Eliminar</span>
+                    </button>
+                  )}
+                  {v.estado === 'activo' && gastos.length > 0 && (
+                    <button
+                      onClick={() => setViajeCancelando(v)}
+                      title="Cancelar viaje"
+                      className="min-h-11 py-2 flex items-center justify-center gap-1.5 border border-red-200 text-red-700 text-base font-medium px-3 rounded-xl hover:bg-red-50 transition-colors"
+                    >
+                      <Ban size={16} /><span className="hidden sm:inline">Cancelar</span>
+                    </button>
                   )}
                 </div>
               </div>

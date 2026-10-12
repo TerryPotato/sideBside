@@ -74,6 +74,7 @@ export default function Usuarios() {
   const [showForm, setShowForm] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [creado, setCreado] = useState(null)
+  const [guardando, setGuardando] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [errors, setErrors] = useState({})
   const [busqueda, setBusqueda] = useState('')
@@ -98,6 +99,8 @@ export default function Usuarios() {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
+    if (guardando) return
+    setGuardando(true)
     try {
       const usuario = await agregarUsuario(form)
       setForm(emptyForm)
@@ -106,6 +109,8 @@ export default function Usuarios() {
       setCreado(usuario)
     } catch (err) {
       toast.error(err.message)
+    } finally {
+      setGuardando(false)
     }
   }
 
@@ -181,7 +186,7 @@ export default function Usuarios() {
             <div className="flex gap-2 pt-1">
               <button type="button" onClick={() => { setShowForm(false); setErrors({}) }}
                 className="min-h-11 py-2 flex-1 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl text-base hover:bg-gray-50 transition-colors">Cancelar</button>
-              <button type="submit" className="min-h-11 py-2 flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-base transition-colors">Crear usuario</button>
+              <button type="submit" disabled={guardando} className="min-h-11 py-2 flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl text-base transition-colors">{guardando ? 'Creando...' : 'Crear usuario'}</button>
             </div>
           </form>
         </div>
