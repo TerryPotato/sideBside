@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Eye, FileSpreadsheet, FileText, ChevronLeft, ChevronRight, X, MapPin, Calendar, Tag, DollarSign, ImageOff, ClipboardCheck, Search, Loader2 } from 'lucide-react'
 import EmptyState from '../../components/EmptyState'
 import AprobacionModal from '../../components/AprobacionModal'
@@ -174,6 +175,19 @@ export default function TodosGastos() {
     setAprobacion({ viaje, initialIdx: Math.max(0, initialIdx) })
   }
 
+  // Al llegar desde una notificacion se abre ese gasto: para revisarlo si
+  // sigue pendiente, o su detalle si ya se aprobo o rechazo.
+  const { state } = useLocation()
+  const [avisoAbierto, setAvisoAbierto] = useState(null)
+  useEffect(() => {
+    if (!state?.gastoId || avisoAbierto === state) return
+    const gasto = gastos.find(g => g.id === state.gastoId)
+    if (!gasto) return
+    setAvisoAbierto(state)
+    if (gasto.estado === 'Pendiente') abrirAprobacion(gasto)
+    else setGastoDetalle(gasto)
+  }, [state, gastos])
+
   const [busqueda, setBusqueda] = useState('')
   const [desde, setDesde] = useState('')
   const [hasta, setHasta] = useState('')
@@ -297,24 +311,24 @@ export default function TodosGastos() {
               />
             </div>
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 flex-1 min-w-[9rem] sm:flex-none">
             <label className="text-base text-gray-700">Fecha desde</label>
-            <input type="date" value={desde} onChange={e => { setDesde(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
+            <input type="date" value={desde} onChange={e => { setDesde(e.target.value); setPagina(1) }} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 flex-1 min-w-[9rem] sm:flex-none">
             <label className="text-base text-gray-700">Fecha hasta</label>
-            <input type="date" value={hasta} onChange={e => { setHasta(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
+            <input type="date" value={hasta} onChange={e => { setHasta(e.target.value); setPagina(1) }} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 flex-1 min-w-[9rem] sm:flex-none">
             <label className="text-base text-gray-700">Categoría</label>
-            <select value={categoria} onChange={e => { setCategoria(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 bg-white">
+            <select value={categoria} onChange={e => { setCategoria(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 bg-white w-full">
               <option>Todas</option>
               {categorias.map(c => <option key={c.id}>{c.nombre}</option>)}
             </select>
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 flex-1 min-w-[9rem] sm:flex-none">
             <label className="text-base text-gray-700">Estado</label>
-            <select value={estado} onChange={e => { setEstado(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 bg-white">
+            <select value={estado} onChange={e => { setEstado(e.target.value); setPagina(1) }} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 bg-white w-full">
               <option>Todos</option>
               <option>Aprobado</option>
               <option>Pendiente</option>

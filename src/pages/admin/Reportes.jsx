@@ -144,13 +144,13 @@ export default function Reportes() {
       {/* Filtros */}
       <div className="bg-white rounded-xl border border-black shadow-sm p-4 mb-4">
         <div className="flex flex-wrap gap-3 items-end">
-          <div>
+          <div className="flex-1 min-w-[9rem] sm:flex-none">
             <label className="block text-base text-gray-700 mb-1">Desde</label>
-            <input type="date" value={desde} onChange={e => setDesde(e.target.value)} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
+            <input type="date" value={desde} onChange={e => setDesde(e.target.value)} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
-          <div>
+          <div className="flex-1 min-w-[9rem] sm:flex-none">
             <label className="block text-base text-gray-700 mb-1">Hasta</label>
-            <input type="date" value={hasta} onChange={e => setHasta(e.target.value)} className="border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
+            <input type="date" value={hasta} onChange={e => setHasta(e.target.value)} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500" />
           </div>
           <button
             onClick={generarReporte}

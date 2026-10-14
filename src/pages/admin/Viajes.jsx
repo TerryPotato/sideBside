@@ -125,6 +125,7 @@ export default function Viajes() {
         </div>
         <button
           onClick={() => setShowForm(true)}
+          aria-label="Nuevo viaje"
           className="min-h-11 py-2 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium px-3 sm:px-4 rounded-xl transition-colors flex-shrink-0"
         >
           <Plus size={16} /><span className="hidden sm:inline">Nuevo viaje</span>

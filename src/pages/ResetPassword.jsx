@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import * as authApi from '../api/auth'
+import logo from '../assets/logo-sidebside.png'
 
 // Misma regla que el backend (src/utils/validations.js validarFortalezaContrasena):
 // minimo 8 caracteres, al menos una letra y un numero.
@@ -52,10 +53,7 @@ export default function ResetPassword() {
     <div className="min-h-screen bg-gradient-to-br from-[#1a2456] to-[#2a3a8f] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
         <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">S</div>
-            <span className="text-2xl font-bold text-[#1a2456]">SideBSide</span>
-          </div>
+          <img src={logo} alt="SideBSide" width="480" height="182" className="h-20 w-auto mx-auto mb-2" />
         </div>
 
         {!token ? (

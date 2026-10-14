@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { ChevronDown, ChevronUp, FileSpreadsheet, FileText, Calendar, DollarSign } from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import { useAuth } from '../../context/AuthContext'
@@ -25,7 +26,23 @@ export default function Historial() {
   const { viajes, gastosDeViaje } = useData()
   const { user } = useAuth()
   const misViajes = viajes.filter(v => v.usuario_id === user?.id)
-  const [abiertos, setAbiertos] = useState({})
+  // Al llegar desde una notificacion se abre su viaje y se resalta el gasto.
+  const { state } = useLocation()
+  const [abiertos, setAbiertos] = useState(() => state?.viajeId ? { [state.viajeId]: true } : {})
+  const resaltado = state?.gastoId
+
+  useEffect(() => {
+    if (!state?.viajeId) return
+    setAbiertos(prev => ({ ...prev, [state.viajeId]: true }))
+    // La tabla de escritorio y las tarjetas del celular existen las dos;
+    // se baja a la que se esta viendo.
+    const id = state.gastoId ? `gasto-${state.gastoId}` : `viaje-${state.viajeId}`
+    const t = setTimeout(() => {
+      const el = [...document.querySelectorAll(`[data-ancla="${id}"]`)].find(e => e.offsetParent !== null)
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 100)
+    return () => clearTimeout(t)
+  }, [state])
 
   function toggle(id) {
     setAbiertos(prev => ({ ...prev, [id]: !prev[id] }))
@@ -104,7 +121,7 @@ export default function Historial() {
           const abierto = !!abiertos[v.id]
 
           return (
-            <div key={v.id} className="bg-white rounded-xl border border-black shadow-sm overflow-hidden">
+            <div key={v.id} data-ancla={`viaje-${v.id}`} className="bg-white rounded-xl border border-black shadow-sm overflow-hidden">
               {/* Cabecera del viaje */}
               <button
                 onClick={() => toggle(v.id)}
@@ -159,7 +176,7 @@ export default function Historial() {
                           </thead>
                           <tbody>
                             {gastos.map((g, i) => (
-                              <tr key={i} className={`border-b last:border-0 transition-colors ${estadoFila[g.estado]}`}>
+                              <tr key={i} data-ancla={`gasto-${g.id}`} className={`border-b last:border-0 transition-colors ${estadoFila[g.estado]} ${g.id === resaltado ? 'outline outline-2 -outline-offset-2 outline-blue-600' : ''}`}>
                                 <td className="px-5 py-2.5 text-gray-700 whitespace-nowrap">{formatDate(g.fecha)}</td>
                                 <td className="px-5 py-2.5 text-gray-700">{g.descripcion}</td>
                                 <td className="px-5 py-2.5 text-gray-700">{g.categoria}</td>
@@ -176,7 +193,7 @@ export default function Historial() {
                       {/* Cards mobile */}
                       <div className="sm:hidden divide-y">
                         {gastos.map((g, i) => (
-                          <div key={i} className={`p-4 flex items-start justify-between gap-2 transition-colors ${estadoFila[g.estado]}`}>
+                          <div key={i} data-ancla={`gasto-${g.id}`} className={`p-4 flex items-start justify-between gap-2 transition-colors ${estadoFila[g.estado]} ${g.id === resaltado ? 'outline outline-2 -outline-offset-2 outline-blue-600' : ''}`}>
                             <div>
                               <p className="text-base font-medium text-gray-800">{g.descripcion}</p>
                               <p className="text-base text-gray-600 mt-0.5">{g.categoria} · {formatDate(g.fecha)}</p>

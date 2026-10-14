@@ -4,3 +4,44 @@
   from { transform: scaleX(1); }
   to { transform: scaleX(0); }
 }
+
+/* En el iPhone los campos de fecha traen un ancho minimo propio que los
+   saca del cuadro, se ven grises, con el texto centrado y, vacios, mas bajos
+   que los demas campos. Se igualan al resto del formulario. */
+@layer base {
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 3.25rem;
+    background-color: #fff;
+    text-align: left;
+  }
+  input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+    margin: 0;
+  }
+  @supports (-webkit-touch-callout: none) {
+    input[type="date"],
+    input[type="time"],
+    input[type="datetime-local"] {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+  }
+}
+
+/* Las listas desplegables se ven grises y distintas en cada celular. Se usa
+   una flecha propia para que se vean igual que los demas campos. Va fuera de
+   @layer para ganarle al padding de las clases (px-4) y dejar lugar a la
+   flecha. */
+select:not([multiple]) {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.1rem;
+  padding-right: 2.5rem;
+}

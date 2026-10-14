@@ -1,7 +1,9 @@
-import { CheckCircle, XCircle, Clock, Bell, Plane } from 'lucide-react'
+import { CheckCircle, XCircle, Clock, Bell, Plane, ChevronRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import { useAuth } from '../context/AuthContext'
 import { formatDateTime } from '../utils/date'
+import { destinoNotificacion } from '../utils/notificacionDestino'
 
 const config = {
   aprobado: { icon: CheckCircle, bg: 'bg-green-100', text: 'text-green-800', label: 'Aprobado' },
@@ -16,8 +18,14 @@ function esHoy(iso) {
 }
 
 export default function Notificaciones() {
-  const { notificaciones, marcarNotificacionLeida, marcarTodasNotificacionesLeidas } = useData()
+  const { notificaciones, marcarNotificacionLeida, marcarTodasNotificacionesLeidas, gastos, viajes } = useData()
   const { user } = useAuth()
+  const navigate = useNavigate()
+
+  function abrir(n, destino) {
+    if (!n.leido) marcarNotificacionLeida(n.id)
+    if (destino) navigate(destino.ruta, { state: destino.state })
+  }
 
   const hoy = notificaciones.filter(n => esHoy(n.fecha_creacion))
   const anteriores = notificaciones.filter(n => !esHoy(n.fecha_creacion))
@@ -25,9 +33,13 @@ export default function Notificaciones() {
 
   function Item({ n }) {
     const { icon: Icono, bg, text } = config[n.tipo] ?? config.info
+    const destino = destinoNotificacion(n, { rol: user?.rol, gastos, viajes })
     return (
       <div
-        onClick={() => marcarNotificacionLeida(n.id)}
+        role="button"
+        tabIndex={0}
+        onClick={() => abrir(n, destino)}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(n, destino) } }}
         className={`flex items-start gap-3 p-3.5 rounded-2xl cursor-pointer border transition-all active:scale-[0.99] ${
           !n.leido
             ? 'bg-blue-50 border-blue-300 border-l-4 border-l-blue-600 shadow-md shadow-blue-100'
@@ -45,6 +57,7 @@ export default function Notificaciones() {
           </p>
         </div>
         {!n.leido && <span className="bg-blue-600 text-white text-base font-semibold px-2.5 py-0.5 rounded-full flex-shrink-0">Nueva</span>}
+        {destino && <ChevronRight size={20} className="text-gray-500 flex-shrink-0 self-center" />}
       </div>
     )
   }
@@ -65,7 +78,7 @@ export default function Notificaciones() {
       </div>
 
       <div className="p-4 space-y-5">
-        <p className="text-base text-gray-700 -mt-1">Aquí ves los avisos de gastos, viajes y aprobaciones. Da clic en una para marcarla como leída.</p>
+        <p className="text-base text-gray-700 -mt-1">Aquí ves los avisos de gastos, viajes y aprobaciones. Da clic en una para ver el gasto o viaje del que se trata.</p>
 
         {/* Hoy */}
         {hoy.length > 0 && (
