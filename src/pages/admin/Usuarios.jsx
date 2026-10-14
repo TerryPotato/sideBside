@@ -170,6 +170,7 @@ export default function Usuarios() {
                 <div key={f} className={f === 'nombre' ? 'sm:col-span-2' : ''}>
                   <label className="flex items-center text-base font-semibold text-gray-600 mb-1">{label} <span className="text-red-600 ml-1">*</span><FieldHint text={hint} /></label>
                   <input value={form[f]} onChange={e => set(f, e.target.value)}
+                    {...(f === 'email' && { type: 'email', autoCapitalize: 'none', autoCorrect: 'off', spellCheck: false })}
                     className={`w-full border-2 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 ${errors[f] ? 'border-red-400' : 'border-gray-200'}`} />
                   {errors[f] && <p className="text-base text-red-600 mt-1">{errors[f]}</p>}
                 </div>

@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext'
 import FieldHint from '../../components/FieldHint'
 import * as gastosApi from '../../api/gastos'
 import { reducirImagen } from '../../utils/imagen'
+import { formatDateRange } from '../../utils/date'
 
 const monedas = [{ val: 'MXN', label: 'MXN — Peso mexicano' }, { val: 'USD', label: 'USD — Dólar' }, { val: 'EUR', label: 'EUR — Euro' }]
 
@@ -140,6 +141,9 @@ export default function NuevoGasto() {
   const categoriasActivas = categorias.filter(c => c.activo)
 
   const [form, setForm] = useState(empty)
+  // La fecha del gasto debe caer dentro del viaje (el backend lo exige igual);
+  // se puede registrar antes de que el viaje empiece, p. ej. un pago adelantado.
+  const viajeSel = viajes.find(v => String(v.id) === String(form.viaje_id))
   const [errors, setErrors] = useState({})
   const [geoLoading, setGeoLoading] = useState(false)
   const [enviando, setEnviando] = useState(false)
@@ -279,6 +283,9 @@ export default function NuevoGasto() {
     if (form.iva && Number(form.iva) > Number(form.monto)) e.iva = 'El IVA no puede ser mayor al monto'
     if (!form.categoria) e.categoria = 'Selecciona una categoría'
     if (!form.fecha) e.fecha = 'Selecciona la fecha'
+    else if (viajeSel && (form.fecha < viajeSel.fecha_inicio || form.fecha > viajeSel.fecha_fin)) {
+      e.fecha = `La fecha debe estar dentro del viaje (${formatDateRange(viajeSel.fecha_inicio, viajeSel.fecha_fin)})`
+    }
     const tieneAlgunDocumento = form.recibo || form.facturaPdf || form.facturaXml
       || adjuntosExistentes.recibo || adjuntosExistentes.facturaPdf || adjuntosExistentes.facturaXml
     if (requireDocs && !tieneAlgunDocumento) e.recibo = 'Sube al menos el recibo o la factura'
@@ -438,6 +445,7 @@ export default function NuevoGasto() {
           <div>
             <label className="flex items-center text-base font-semibold text-gray-800 mb-2">Fecha del gasto <span className="text-red-600 ml-1">*</span><FieldHint text="La fecha en que realmente se hizo el gasto, no la fecha de hoy." /></label>
             <input type="date" value={form.fecha} onChange={e => set('fecha', e.target.value)}
+              min={viajeSel?.fecha_inicio} max={viajeSel?.fecha_fin}
               className={`w-full border-2 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500 ${errors.fecha ? 'border-red-400' : 'border-gray-200'}`} />
             {errors.fecha && <p className="text-base text-red-600 mt-1.5 flex items-center gap-1"><AlertCircle size={16} />{errors.fecha}</p>}
           </div>

@@ -52,6 +52,9 @@ function OlvideContrasena({ onBack }) {
           id="recuperar-email"
           type="email"
           autoComplete="email"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           placeholder="usuario@ejemplo.com"
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -130,6 +133,9 @@ export default function Login() {
                   id="email"
                   type="email"
                   autoComplete="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   placeholder="usuario@ejemplo.com"
                   value={form.email}
                   onChange={e => set('email', e.target.value)}
