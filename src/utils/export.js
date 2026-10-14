@@ -1,13 +1,13 @@
-import * as XLSX from 'xlsx'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
+// xlsx y jspdf pesan ~1 MB juntos y casi nadie exporta, asi que se descargan
+// hasta que alguien pulsa el boton (import dinamico), no al abrir la app.
 
 export function todayStamp() {
   return new Date().toISOString().slice(0, 10)
 }
 
 // sheets: [{ name, rows: [{ Columna: valor, ... }] }]
-export function exportExcel(filename, sheets) {
+export async function exportExcel(filename, sheets) {
+  const XLSX = await import('xlsx')
   const wb = XLSX.utils.book_new()
   for (const { name, rows } of sheets) {
     const ws = XLSX.utils.json_to_sheet(rows)
@@ -17,7 +17,11 @@ export function exportExcel(filename, sheets) {
 }
 
 // sections: [{ heading?, columns: [{ header, key }], rows }]
-export function exportPDF({ filename, title, subtitle, sections }) {
+export async function exportPDF({ filename, title, subtitle, sections }) {
+  const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable'),
+  ])
   const doc = new jsPDF()
   let y = 16
 

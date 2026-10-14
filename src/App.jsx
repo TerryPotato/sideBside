@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'
 import { X } from 'lucide-react'
@@ -5,20 +6,22 @@ import { AuthProvider } from './context/AuthContext'
 import { DataProvider } from './context/DataContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
-import ResetPassword from './pages/ResetPassword'
-import DashboardLayout from './layouts/DashboardLayout'
-import DashboardOperador from './pages/operador/Dashboard'
-import NuevoGasto from './pages/operador/NuevoGasto'
-import Historial from './pages/operador/Historial'
-import Borradores from './pages/operador/Borradores'
-import Perfil from './pages/operador/Perfil'
-import DashboardAdmin from './pages/admin/Dashboard'
-import Viajes from './pages/admin/Viajes'
-import TodosGastos from './pages/admin/TodosGastos'
-import Reportes from './pages/admin/Reportes'
-import Categorias from './pages/admin/Categorias'
-import Usuarios from './pages/admin/Usuarios'
-import Notificaciones from './pages/Notificaciones'
+// Cada pantalla se descarga al abrirla. Antes todo venia en un solo archivo
+// de 2 MB (con Excel y PDF incluidos) que el login tenia que bajar completo.
+const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'))
+const DashboardOperador = lazy(() => import('./pages/operador/Dashboard'))
+const NuevoGasto = lazy(() => import('./pages/operador/NuevoGasto'))
+const Historial = lazy(() => import('./pages/operador/Historial'))
+const Borradores = lazy(() => import('./pages/operador/Borradores'))
+const Perfil = lazy(() => import('./pages/operador/Perfil'))
+const DashboardAdmin = lazy(() => import('./pages/admin/Dashboard'))
+const Viajes = lazy(() => import('./pages/admin/Viajes'))
+const TodosGastos = lazy(() => import('./pages/admin/TodosGastos'))
+const Reportes = lazy(() => import('./pages/admin/Reportes'))
+const Categorias = lazy(() => import('./pages/admin/Categorias'))
+const Usuarios = lazy(() => import('./pages/admin/Usuarios'))
+const Notificaciones = lazy(() => import('./pages/Notificaciones'))
 
 export default function App() {
   return (
@@ -58,6 +61,7 @@ export default function App() {
               </ToastBar>
             )}
           </Toaster>
+          <Suspense fallback={<div className="min-h-screen" />}>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/restablecer-contrasena" element={<ResetPassword />} />
@@ -93,6 +97,7 @@ export default function App() {
 
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
+          </Suspense>
         </BrowserRouter>
       </DataProvider>
     </AuthProvider>

@@ -203,9 +203,9 @@ export default function TodosGastos() {
     return viajes.find(v => v.id === viaje_id)?.nombre ?? '—'
   }
 
-  function descargarExcel() {
+  async function descargarExcel() {
     if (filtrados.length === 0) return toast.error('No hay gastos para exportar')
-    exportExcel(`gastos-${todayStamp()}.xlsx`, [{
+    await exportExcel(`gastos-${todayStamp()}.xlsx`, [{
       name: 'Gastos',
       rows: filtrados.map(g => ({
         Empleado: g.empleado,
@@ -220,9 +220,9 @@ export default function TodosGastos() {
     toast.success('Excel descargado')
   }
 
-  function descargarPDF() {
+  async function descargarPDF() {
     if (filtrados.length === 0) return toast.error('No hay gastos para exportar')
-    exportPDF({
+    await exportPDF({
       filename: `gastos-${todayStamp()}.pdf`,
       title: 'Todos los Gastos',
       subtitle: `generado el ${new Date().toLocaleDateString('es-MX')}`,

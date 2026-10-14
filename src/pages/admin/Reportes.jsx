@@ -51,7 +51,7 @@ export default function Reportes() {
     try {
       const params = { fecha_desde: desde || undefined, fecha_hasta: hasta || undefined }
       const detalle = await reportesApi.general(params)
-      exportExcel(`reporte-gastos-${todayStamp()}.xlsx`, [
+      await exportExcel(`reporte-gastos-${todayStamp()}.xlsx`, [
         {
           name: 'Resumen',
           rows: [{
@@ -83,7 +83,7 @@ export default function Reportes() {
       const params = { fecha_desde: desde || undefined, fecha_hasta: hasta || undefined }
       const detalle = await reportesApi.general(params)
       const rango = desde || hasta ? `Período: ${desde ? formatDate(desde) : '—'} a ${hasta ? formatDate(hasta) : '—'}` : 'Período: todos los registros'
-      exportPDF({
+      await exportPDF({
         filename: `reporte-gastos-${todayStamp()}.pdf`,
         title: 'Reporte de Gastos',
         subtitle: `${rango} · generado el ${new Date().toLocaleDateString('es-MX')}`,

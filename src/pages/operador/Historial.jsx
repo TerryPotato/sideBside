@@ -35,9 +35,9 @@ export default function Historial() {
 
   const filas = misViajes.flatMap(v => gastosDeViaje(v.id).map(g => ({ ...g, viajeNombre: v.nombre })))
 
-  function descargarExcel() {
+  async function descargarExcel() {
     if (filas.length === 0) return toast.error('No hay gastos para exportar')
-    exportExcel(`historial-gastos-${todayStamp()}.xlsx`, [{
+    await exportExcel(`historial-gastos-${todayStamp()}.xlsx`, [{
       name: 'Historial',
       rows: filas.map(g => ({
         Viaje: g.viajeNombre,
@@ -51,9 +51,9 @@ export default function Historial() {
     toast.success('Excel descargado')
   }
 
-  function descargarPDF() {
+  async function descargarPDF() {
     if (filas.length === 0) return toast.error('No hay gastos para exportar')
-    exportPDF({
+    await exportPDF({
       filename: `historial-gastos-${todayStamp()}.pdf`,
       title: 'Historial de Gastos',
       subtitle: `${user?.nombre ?? ''} · generado el ${new Date().toLocaleDateString('es-MX')}`,

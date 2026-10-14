@@ -1,0 +1,5 @@
+# Los archivos de /assets llevan un hash en el nombre (index-BEKzNYEf.js):
+# si cambian, cambia el nombre. Por eso el navegador puede guardarlos un año
+# y solo vuelve a descargar lo que de verdad cambio en cada deploy.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
