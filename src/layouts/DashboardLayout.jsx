@@ -57,7 +57,7 @@ function SidebarContent({ navItems, onNavigate, onLogout, user, avatar, noLeidas
     <>
       <div className="px-4 py-5 border-b border-white/10">
         <div className="flex items-center gap-2 mb-4">
-          <img src="/icono-sidebside.svg" alt="" className="w-9 h-9 flex-shrink-0" />
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-base flex-shrink-0">S</div>
           <div>
             <p className="text-white font-bold text-base leading-tight">SideBSide</p>
             <p className="text-blue-300 text-base">Gestión de gastos</p>
@@ -163,7 +163,7 @@ export default function DashboardLayout({ role }) {
         <header className="md:hidden bg-[#1a2456] px-4 py-3 flex items-center gap-3 flex-shrink-0 shadow">
           <IconButton icon={Menu} label="Abrir menú" onClick={() => setMobileOpen(true)} variant="ghostOnDark" iconSize={24} className="-ml-1.5" />
           <div className="flex items-center gap-2">
-            <img src="/icono-sidebside.svg" alt="" className="w-8 h-8" />
+            <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-base">S</div>
             <span className="text-white font-bold text-base">SideBSide</span>
           </div>
           {/* En celular el menu esta cerrado casi siempre: sin esto, las
